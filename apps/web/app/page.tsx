@@ -1,4 +1,11 @@
+import { DrawPath } from "../components/Ludo/DrawPath";
 import { StartBorad } from "../components/Ludo/StartBorad";
+import {
+  bluePath,
+  greenPath,
+  redPath,
+  yellowPath,
+} from "../lib/constant";
 
 export default function Page() {
   return (
@@ -14,34 +21,46 @@ export default function Page() {
           <StartBorad bgColor="bg-red-500" />
         </div>
         <div className="red-path horizontal-path bg-zinc-50">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="-m-px border border-slate-950"></div>
-          ))}
+          <DrawPath
+            className=" -m-px border border-slate-950"
+            path={redPath}
+            safePlace={["R1", "B8"]}
+            pathname="redPath"
+          />
         </div>
         <div className="green-board flex items-center justify-center rounded-sm bg-green-500/80">
           <StartBorad bgColor="bg-green-500" />
         </div>
         <div className="green-path vertical-path bg-zinc-50">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className=" border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"></div>
-          ))}
+          <DrawPath
+            path={greenPath}
+            pathname="greenPath"
+            safePlace={["G1", "R8"]}
+            className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
+          />
         </div>
         <div className="win-zone rounded-sm bg-zinc-50  border-t-0 border-r-0 border-b-[0.25px] border-l-[.25px] border-slate-950"></div>
         <div className="blue-board rounded-sm  flex items-center justify-center bg-blue-500/70">
           <StartBorad bgColor="bg-blue-500" />
         </div>
         <div className="blue-path vertical-path bg-zinc-50">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className=" border-b-[.25px]  border-r-[.25px] border-l-0 border-slate-950"></div>
-          ))}
+          <DrawPath
+            path={bluePath}
+            pathname="bluepPath"
+            safePlace={["B1", "Y8"]}
+            className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
+          />
         </div>
         <div className="yellow-board flex items-center justify-center rounded-sm  bg-yellow-300/70">
           <StartBorad bgColor="bg-yellow-400" />
         </div>
         <div className="yellow-path horizontal-path bg-zinc-50">
-          {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className=" -m-px border border-slate-950"></div>
-          ))}
+          <DrawPath
+            className=" -m-px border border-slate-950"
+            path={yellowPath}
+            safePlace={["Y1", "G8"]}
+            pathname="yellow"
+          />
         </div>
       </div>
       <div className="h-[100px] mx-auto flex p-2 justify-center  w-[80%] bg-slate-800 rounded-md ">
