@@ -27,8 +27,10 @@ body {
 
 #ludoBoard {
   display: grid;
-  width: 500px;
-  height: 500px;
+  max-width: 500px;
+  max-height: 500px; 
+  min-width: 500px; 
+  min-height: 500px;
   background: white;
 
   grid-template-columns: repeat(5, 1fr);
