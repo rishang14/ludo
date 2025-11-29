@@ -64,13 +64,14 @@ body{
 }
 
 .horizontal-path{
-  display: grid;
+  display: grid;  
+  gap: 1px;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: repeat(3, 1fr);
 }
 
 .vertical-path{
-  display: grid;
+  display: grid;  
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(6, 1fr);
 }

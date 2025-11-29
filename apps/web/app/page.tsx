@@ -15,7 +15,7 @@ export default function Page() {
         </div>
         <div className="red-path horizontal-path bg-zinc-50">
           {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="border-[0.1px] border-slate-950"></div>
+            <div key={i} className="-m-px border border-slate-950"></div>
           ))}
         </div>
         <div className="green-board flex items-center justify-center rounded-sm bg-green-500/80">
@@ -23,16 +23,16 @@ export default function Page() {
         </div>
         <div className="green-path vertical-path bg-zinc-50">
           {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="border-[0.1px] border-slate-950"></div>
+            <div key={i} className=" border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"></div>
           ))}
         </div>
-        <div className="win-zone rounded-sm bg-zinc-50 border-[0.25px] border-slate-950"></div>
+        <div className="win-zone rounded-sm bg-zinc-50  border-t-0 border-r-0 border-b-[0.25px] border-l-[.25px] border-slate-950"></div>
         <div className="blue-board rounded-sm  flex items-center justify-center bg-blue-500/70">
           <StartBorad bgColor="bg-blue-500" />
         </div>
         <div className="blue-path vertical-path bg-zinc-50">
           {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="border-[0.1px] border-slate-950"></div>
+            <div key={i} className=" border-b-[.25px]  border-r-[.25px] border-l-0 border-slate-950"></div>
           ))}
         </div>
         <div className="yellow-board flex items-center justify-center rounded-sm  bg-yellow-300/70">
@@ -40,7 +40,7 @@ export default function Page() {
         </div>
         <div className="yellow-path horizontal-path bg-zinc-50">
           {Array.from({ length: 18 }).map((_, i) => (
-            <div key={i} className="border-[0.1px] border-slate-950"></div>
+            <div key={i} className=" -m-px border border-slate-950"></div>
           ))}
         </div>
       </div>
