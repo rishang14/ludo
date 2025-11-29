@@ -5,7 +5,8 @@ import {
   greenPath,
   redPath,
   yellowPath,
-} from "../lib/constant";
+} from "../lib/constant"; 
+
 
 export default function Page() {
   return (

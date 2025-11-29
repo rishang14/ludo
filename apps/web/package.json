@@ -14,7 +14,8 @@
     "@repo/ui": "workspace:*",
     "next": "^16.0.1",
     "react": "^19.2.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-icons": "^5.5.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^15.4.6",
