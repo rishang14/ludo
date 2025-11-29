@@ -24,3 +24,57 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+#ludoBoard {
+  display: grid;
+  width: 500px;
+  height: 500px;
+  background: white;
+
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+
+  grid-template-areas:
+    "redBoard redBoard greenPath greenBoard greenBoard"
+    "redBoard redBoard greenPath greenBoard greenBoard"
+    "redPath redPath winZone yellowPath yellowPath"
+    "blueBoard blueBoard bluePath yellowBoard yellowBoard"
+    "blueBoard blueBoard bluePath yellowBoard yellowBoard";
+}
+
+/* Each region’s slot */
+.red-board {
+  grid-area: redBoard;
+}
+
+.red-path {
+  grid-area: redPath;
+}
+
+.green-board {
+  grid-area: greenBoard;
+}
+
+.green-path {
+  grid-area: greenPath;
+}
+
+.yellow-board {
+  grid-area: yellowBoard;
+}
+
+.yellow-path {
+  grid-area: yellowPath;
+}
+
+.blue-board {
+  grid-area: blueBoard;
+}
+
+.blue-path {
+  grid-area: bluePath;
+}
+
+.win-zone {
+  grid-area: winZone;
+}
