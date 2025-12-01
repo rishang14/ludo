@@ -122,3 +122,11 @@ export const DiceValues: diceType[] = [
     img: six,
   },
 ];
+
+
+ 
+
+export const yellowPawnHome=["YP1","YP2","YP3", "YP4"] 
+export const bluePawnHome=["BP1","BP2","BP3", "BP4"]  
+export const greenPawnHome=["GP1","GP2","GP3", "GP4"] 
+export const redPawnHome= ["RP1","RP2","RP3", "RP4"]   
