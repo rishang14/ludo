@@ -1,3 +1,5 @@
+"use client"
+import { Dice } from "@/components/Ludo/Dice";
 import { DrawPath } from "../components/Ludo/DrawPath";
 import { StartBorad } from "../components/Ludo/StartBorad";
 import {
@@ -6,9 +8,17 @@ import {
   redPath,
   yellowPath,
 } from "../lib/constant"; 
+import { useCallback, useState } from "react";
 
-
-export default function Page() {
+export default function Page() {  
+const [val, setVal] = useState(1)
+  const rollDice=useCallback(
+    () => {
+    const randomNumber=Math.floor(Math.random() * 6) + 1 
+    setVal(randomNumber);   
+    },
+    [],
+  )
   return (
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
@@ -64,8 +74,9 @@ export default function Page() {
           />
         </div>
       </div>
-      <div className="h-[100px] mx-auto flex p-2 justify-center  w-[80%] bg-slate-800 rounded-md ">
-        <h1 className="text-white font-serif   ">Dice Roll</h1>
+      <div className="h-[150px] mx-auto flex p-2 justify-center flex-col gap-2 items-center w-[80%] bg-slate-800 rounded-md ">
+        <h1 className="text-white font-serif   ">Dice Roll</h1> 
+        <Dice value={val} rollDice={rollDice}/>
       </div>
     </div>
   );

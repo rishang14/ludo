@@ -4,7 +4,7 @@ import {
   greenSafePlace,
   redSafePlace,
   yellowSafePlace,
-} from "../../lib/constant"; 
+} from "@/lib/constant"; 
 
 
 interface prop {
@@ -18,9 +18,9 @@ export const DrawPath = ({ path, safePlace, className }: prop) => {
   return (
     <>
       {path.map((p: string, i: number) => (
-        <div key={i} id={p} className={`${className}`}>
+        <div key={i} id={p} className={`${className} flex items-center justify-center  `}>
           {
-            (safePlace[0] == p || safePlace[1]== p) && <span className=""><FiStar size={20} height={20} className=""/></span>
+            (safePlace[0] == p || safePlace[1]== p) && <span><FiStar size={20}  /></span>
           }
         </div>
       ))}

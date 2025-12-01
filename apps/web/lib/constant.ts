@@ -1,3 +1,10 @@
+import { one, two, three, four, five, six } from "../public/index";
+
+interface diceType {
+  value: number;
+  img: any;
+}
+
 export const redPath = [
   "B13",
   "R1",
@@ -85,6 +92,33 @@ export const yellowPath = [
 export const globalSafePlace = ["G1", "R1", "Y1", "B1", "G8", "Y8", "B8", "R8"];
 
 export type redSafePlace = ["R1", "B8"];
-export type blueSafePlace = ["B1" , "Y8"];
-export type greenSafePlace = ["G1" , "R8"];
-export type yellowSafePlace = ["Y1" ,"G8"];
+export type blueSafePlace = ["B1", "Y8"];
+export type greenSafePlace = ["G1", "R8"];
+export type yellowSafePlace = ["Y1", "G8"];
+
+export const DiceValues: diceType[] = [
+  {
+    value: 1,
+    img: one,
+  },
+  {
+    value: 2,
+    img: two,
+  },
+  {
+    value: 3,
+    img: three,
+  },
+  {
+    value: 4,
+    img: four,
+  },
+  {
+    value: 5,
+    img: five,
+  },
+  {
+    value: 6,
+    img: six,
+  },
+];

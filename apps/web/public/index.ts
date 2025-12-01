@@ -1,0 +1,6 @@
+export * as one from "./1.png"
+export * as two from "./2.png" 
+export * as three from "./3.png"
+export * as four from "./4.png"
+export * as five from "./5.png"
+export * as six from "./6.png"
