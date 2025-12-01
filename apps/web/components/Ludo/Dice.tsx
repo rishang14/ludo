@@ -30,7 +30,7 @@ export const Dice = ({ value, rollDice }: dice) => {
         e.stopPropagation();
         rollDice();
       }}
-      className="flex cursor-pointer  rounded-md bg-neutral-900  text-white"
+      className="flex cursor-pointer  transform ease-in-out rounded-md bg-neutral-900  text-white"
     >
       {diceMap[value]}
     </div>

@@ -11,9 +11,9 @@ body{
 
 #ludoBoard {
   display: grid;
-  max-width: 500px;
-  max-height: 500px; 
-  min-width: 500px; 
+  min-width: 500px;  
+  max-width: 520px; 
+  max-height: 520px;
   min-height: 500px;
   background: white;
 

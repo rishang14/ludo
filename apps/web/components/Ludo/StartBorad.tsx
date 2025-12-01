@@ -18,7 +18,7 @@ export const StartBorad = ({bgColor,pawnHome,pawnColor}:homeType) => {
               className={`rounded-full h-[40%] flex  items-center    justify-center w-[40%] ${bgColor}`}
               key={i}
             >
-              <Pawn key={i} size={80}  color={pawnColor}/>
+              <Pawn key={i} id={i}  size={80}  color={pawnColor}/>
             </div>
           );
         })}

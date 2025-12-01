@@ -3,13 +3,15 @@
 interface PawnSVGProps {
   color?: string
   size?: number
-  selected?: boolean
+  selected?: boolean 
+  id:string
 }
 
-export const Pawn=({ color = "#EF4444", size = 60, selected = false }: PawnSVGProps)=> {
-  return (
+export const Pawn=({ color = "#EF4444", size = 60, selected = false,id }: PawnSVGProps)=> {
+  return ( 
     <svg
-      width={size}
+      width={size} 
+      id={id}
       height={size}
       viewBox="0 0 100 100"
       className={`transition-transform ${selected ? "scale-110" : "hover:scale-105"}`}

@@ -4,14 +4,19 @@ import { Dice } from "@/components/Ludo/Dice";
 import { DrawPath } from "@/components/Ludo/DrawPath";
 import { StartBorad } from "@/components/Ludo/StartBorad";
 import {
-  bluePath,
+  blueBoardPath,
   bluePawnHome,
-  greenPath,
+  drawBlueColor,
+  drawGreenColor,
+  drawRedColor,
+  drawYellowColor,
+  greenBoardPath,
   greenPawnHome,
-  redPath,
+  redBoardPath,
   redPawnHome,
-  yellowPath,
-  yellowPawnHome,
+  yellowBoardPath,
+  yellowPawnHome, 
+  globaLBoard
 } from "@/lib/constant"; 
 
 export default function Page() {  
@@ -24,7 +29,12 @@ const [show, setShow]= useState(false)
     setShow(true) 
     },
     [],
-  )
+  )   
+  
+
+
+
+  console.log(globaLBoard.flatMap(i  => console.log(i , " ")),"global board")
   return (
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
@@ -39,9 +49,11 @@ const [show, setShow]= useState(false)
         </div>
         <div className="red-path horizontal-path bg-zinc-50">
           <DrawPath
-            className=" -m-px border border-slate-950"
-            path={redPath}
-            safePlace={["R1", "B8"]}
+            className=" -m-px border border-r-0   border-slate-950"
+            path={redBoardPath} 
+            drawBgColorOnPath={drawRedColor}
+            safePlace={["R1", "B8"]} 
+            color="#fb2c36cc"
             pathname="redPath"
           />
         </div>
@@ -50,8 +62,10 @@ const [show, setShow]= useState(false)
         </div>
         <div className="green-path vertical-path bg-zinc-50">
           <DrawPath
-            path={greenPath}
-            pathname="greenPath"
+            path={greenBoardPath} 
+            drawBgColorOnPath={drawGreenColor}
+            pathname="greenPath" 
+            color="#00c950"
             safePlace={["G1", "R8"]}
             className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
           />
@@ -62,10 +76,12 @@ const [show, setShow]= useState(false)
         </div>
         <div className="blue-path vertical-path bg-zinc-50">
           <DrawPath
-            path={bluePath}
-            pathname="bluepPath"
-            safePlace={["B1", "Y8"]}
-            className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
+            path={blueBoardPath}
+            pathname="bluepPath"  
+            drawBgColorOnPath={drawBlueColor}
+            safePlace={["B1", "Y8"]} 
+            color="#2b7fff"
+            className="border-b-[.25px]  border-r-[.25px]   border-slate-950"
           />
         </div>
         <div className="yellow-board flex items-center justify-center rounded-sm  bg-yellow-300/70">
@@ -73,9 +89,11 @@ const [show, setShow]= useState(false)
         </div>
         <div className="yellow-path horizontal-path bg-zinc-50">
           <DrawPath
-            className=" -m-px border border-slate-950"
-            path={yellowPath}
-            safePlace={["Y1", "G8"]}
+            className=" -m-px border border-r-0 border-slate-950"
+            path={yellowBoardPath} 
+            drawBgColorOnPath={drawYellowColor}
+            safePlace={["Y1", "G8"]} 
+            color="#fdc700"
             pathname="yellow"
           />
         </div>
