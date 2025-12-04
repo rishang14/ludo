@@ -22,7 +22,7 @@ const diceMap: Record<number, any> = {
 
 export const Dice = () => {  
 
-  const {diceVal,rollDice,nextMovement}=useGameStore()
+  const {diceVal,rollDice}=useGameStore()
   return (
     <div
       onClick={(e) => {

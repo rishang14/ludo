@@ -5,6 +5,8 @@ import {
   redSafePlace,
   yellowSafePlace,
 } from "@/lib/constant";
+import { pawn, useGameStore } from "@/state/gameStore";
+import { Pawn } from "./Pawn";
 
 interface prop {
   path: string[];
@@ -22,23 +24,38 @@ export const DrawPath = ({
   drawBgColorOnPath,
   color,
 }: prop) => {
-const coloured= new Set(drawBgColorOnPath);
+  const coloured = new Set(drawBgColorOnPath);
+  const { pawnMap, boardMap } = useGameStore(); 
+  console.log("pawnMap",pawnMap) 
+  console.log("board",boardMap)
   return (
     <>
-      {path.map((p: string, i: number) => (
-        <div
-          key={i}
-          id={p}
-          className={`${className} flex items-center justify-center  `} 
-          style={{backgroundColor: coloured.has(p) ? color : undefined}}
-        >
-          {(safePlace[0] == p || safePlace[1] == p) && (
-            <span>
-              <FiStar size={20} />{" "}
-            </span>
-          )} 
-        </div>
-      ))}
+      {path.map((p: string, i: number) => {
+        const cell = boardMap.get(p);
+        let pawns: pawn[] = [];
+        if (cell) {
+          for (let p of cell) {
+            if (p) {
+              pawns.push(pawnMap.get(p)!);
+            }
+          }
+        }
+        return (
+          <div
+            key={i}
+            id={p}
+            className={`${className} flex items-center justify-center relative `}
+            style={{ backgroundColor: coloured.has(p) ? color : undefined }}
+          >
+            {(safePlace[0] == p || safePlace[1] == p) && (
+              <span>
+                <FiStar size={20} />{" "}
+              </span>
+            )}  
+            {pawns.map((i) => (i.position === p ? <Pawn key={i.pId} id={i.pId} /> : null))}
+          </div>
+        );
+      })}
     </>
   );
 };

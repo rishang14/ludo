@@ -16,16 +16,13 @@ import {
   redPawnHome,
   yellowBoardPath,
   yellowPawnHome, 
-  globaLBoard
+  globaLBoard 
 } from "@/lib/constant"; 
 import { useGameStore } from "@/state/gameStore";
 
 export default function Page() {  
 
-const {initGameBoard,currTurn,diceVal,moveablePawn}=useGameStore(); 
-console.log(currTurn,"movement") 
-console.log("movable pawn",moveablePawn)
-  
+const {initGameBoard,currTurn,diceVal,moveablePawn,pawnMap}=useGameStore();  
 useEffect(()=>{
 initGameBoard()
 },[])
