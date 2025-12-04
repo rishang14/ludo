@@ -8,6 +8,7 @@ import {
   Dice5Icon,
   Dice6Icon,
 } from "lucide-react";
+import { useGameStore } from "@/state/gameStore";
 
 const diceMap: Record<number, any> = {
   1: <Dice1Icon className="w-full" size={"80px"} />,
@@ -18,12 +19,10 @@ const diceMap: Record<number, any> = {
   6: <Dice6Icon className="w-full" size={"80px"} />,
 };
 
-interface dice {
-  value: number;
-  rollDice: () => void;
-}
 
-export const Dice = ({ value, rollDice }: dice) => {
+export const Dice = () => {  
+
+  const {diceVal,rollDice,nextMovement}=useGameStore()
   return (
     <div
       onClick={(e) => {
@@ -32,7 +31,7 @@ export const Dice = ({ value, rollDice }: dice) => {
       }}
       className="flex cursor-pointer  transform ease-in-out rounded-md bg-neutral-900  text-white"
     >
-      {diceMap[value]}
+      {diceMap[diceVal]}
     </div>
   );
 };

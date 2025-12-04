@@ -87,9 +87,7 @@ export const yellowBoardPath = [
   "Y2",
   "Y1",
   "G13",
-]; 
-
-export const globaLBoard= [redBoardPath,greenBoardPath,blueBoardPath,yellowBoardPath]
+];
 
 export const globalSafePlace = ["G1", "R1", "Y1", "B1", "G8", "Y8", "B8", "R8"];
 
@@ -129,7 +127,16 @@ export const yellowPawnHome = ["YP1", "YP2", "YP3", "YP4"];
 export const bluePawnHome = ["BP1", "BP2", "BP3", "BP4"];
 export const greenPawnHome = ["GP1", "GP2", "GP3", "GP4"];
 export const redPawnHome = ["RP1", "RP2", "RP3", "RP4"];
-
+export const globaLBoard = [
+  redBoardPath,
+  greenBoardPath,
+  blueBoardPath,
+  yellowBoardPath,
+  yellowPawnHome,
+  redPawnHome,
+  bluePawnHome,
+  greenPawnHome,
+];
 export const drawRedColor = ["R1", "RW1", "RW2", "RW3", "RW4", "RW5"];
 export const drawBlueColor = ["B1", "BW1", "BW2", "BW3", "BW4", "BW5"];
 export const drawYellowColor = ["Y1", "YW1", "YW2", "YW3", "YW4", "YW5"];

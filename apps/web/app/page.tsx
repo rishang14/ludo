@@ -1,5 +1,5 @@
 "use client"
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Dice } from "@/components/Ludo/Dice";
 import { DrawPath } from "@/components/Ludo/DrawPath";
 import { StartBorad } from "@/components/Ludo/StartBorad";
@@ -18,23 +18,18 @@ import {
   yellowPawnHome, 
   globaLBoard
 } from "@/lib/constant"; 
+import { useGameStore } from "@/state/gameStore";
 
 export default function Page() {  
-const [val, setVal] = useState(1); 
-const [show, setShow]= useState(false)
-  const rollDice=useCallback(
-    () => {
-    const randomNumber=Math.floor(Math.random() * 6) + 1 
-    setVal(randomNumber);   
-    setShow(true) 
-    },
-    [],
-  )   
+
+const {initGameBoard,currTurn,diceVal,moveablePawn}=useGameStore(); 
+console.log(currTurn,"movement") 
+console.log("movable pawn",moveablePawn)
   
+useEffect(()=>{
+initGameBoard()
+},[])
 
-
-
-  console.log(globaLBoard.flatMap(i  => console.log(i , " ")),"global board")
   return (
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
@@ -99,8 +94,9 @@ const [show, setShow]= useState(false)
         </div>
       </div>
       <div className="h-[150px] mx-auto flex p-2 justify-center flex-col gap-2 items-center w-[80%] bg-slate-800 rounded-md ">
-        <h1 className="text-white font-serif   ">Roll Dice: {show && ` You got ${val}`}</h1> 
-        <Dice value={val} rollDice={rollDice}/>
+        <h1 className="text-white font-serif   ">Roll Dice: {diceVal} </h1>   
+        <h2 className="text-white font-serif">Current turn is of : {currTurn}</h2>
+        <Dice />
       </div>
     </div>
   );
