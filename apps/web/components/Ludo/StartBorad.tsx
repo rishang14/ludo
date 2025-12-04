@@ -5,10 +5,9 @@ import { useGameStore } from "@/state/gameStore";
 interface homeType {
   bgColor: string;
   pawnHome: string[];
-  pawnColor: string;
 }
 
-export const StartBorad = ({ bgColor, pawnHome, pawnColor }: homeType) => {
+export const StartBorad = ({ bgColor, pawnHome }: homeType) => {
   const { pawnMap } = useGameStore(); 
   return (
     <div className="w-[65%] p-2 rounded-sm h-[65%] bg-zinc-50">
@@ -20,7 +19,7 @@ export const StartBorad = ({ bgColor, pawnHome, pawnColor }: homeType) => {
               key={i}
             >
               {pawnMap.get(i)?.position === i && (
-                <Pawn key={i} id={i} size={60} color={pawnColor} />
+                <Pawn key={i} id={i} size={60} color={pawnMap.get(i)?.color}/>
               ) }
             </div>
           );

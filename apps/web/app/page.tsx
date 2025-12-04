@@ -37,7 +37,7 @@ initGameBoard()
 
       <div id="ludoBoard" className="rounded-sm">
         <div className="red-board flex items-center justify-center rounded-sm bg-red-700/70">
-          <StartBorad bgColor="bg-red-500/80" pawnHome={redPawnHome} pawnColor="#fb7185"/>
+          <StartBorad bgColor="bg-red-500/80" pawnHome={redPawnHome} />
         </div>
         <div className="red-path horizontal-path bg-zinc-50">
           <DrawPath
@@ -50,7 +50,7 @@ initGameBoard()
           />
         </div>
         <div className="green-board flex items-center justify-center rounded-sm bg-green-500/80">
-          <StartBorad bgColor="bg-green-500" pawnHome={greenPawnHome} pawnColor="#a7f3d0"/>
+          <StartBorad bgColor="bg-green-500" pawnHome={greenPawnHome} />
         </div>
         <div className="green-path vertical-path bg-zinc-50">
           <DrawPath
@@ -64,7 +64,7 @@ initGameBoard()
         </div>
         <div className="win-zone rounded-sm bg-zinc-50  border-t-0 border-r-0 border-b-[0.25px] border-l-[.25px] border-slate-950"></div>
         <div className="blue-board rounded-sm  flex items-center justify-center bg-blue-500/70">
-          <StartBorad bgColor="bg-blue-500"  pawnHome={bluePawnHome} pawnColor="#93c5fd"/>
+          <StartBorad bgColor="bg-blue-500"  pawnHome={bluePawnHome} />
         </div>
         <div className="blue-path vertical-path bg-zinc-50">
           <DrawPath
@@ -77,7 +77,7 @@ initGameBoard()
           />
         </div>
         <div className="yellow-board flex items-center justify-center rounded-sm  bg-yellow-300/70">
-          <StartBorad bgColor="bg-yellow-400" pawnHome={yellowPawnHome} pawnColor="#fef08a"/>
+          <StartBorad bgColor="bg-yellow-400" pawnHome={yellowPawnHome} />
         </div>
         <div className="yellow-path horizontal-path bg-zinc-50">
           <DrawPath

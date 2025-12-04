@@ -16,7 +16,12 @@ export const Pawn = ({
   id,
 }: PawnSVGProps) => {
   const { movePawn } = useGameStore();
-
+   const pawncolor:Record<string,any>={
+    "Blue": "#93c5fd", 
+    "Red":"#fb7185", 
+    "Green":"#a7f3d0", 
+    "Yellow":"#fef08a"
+   }
   return (
     <svg
       width={size}
@@ -31,11 +36,11 @@ export const Pawn = ({
     >
       <ellipse cx="50" cy="85" rx="35" ry="8" fill="rgba(0,0,0,0.1)" />
 
-      <circle cx="50" cy="40" r="28" fill={color} />
+      <circle cx="50" cy="40" r="28" fill={pawncolor[color]} />
 
-      <rect x="42" y="60" width="16" height="15" fill={color} />
+      <rect x="42" y="60" width="16" height="15" fill={pawncolor[color]} />
 
-      <ellipse cx="50" cy="80" rx="20" ry="12" fill={color} />
+      <ellipse cx="50" cy="80" rx="20" ry="12" fill={pawncolor[color]} />
       <circle cx="40" cy="30" r="8" fill="white" opacity="0.3" />
       <circle
         cx="50"

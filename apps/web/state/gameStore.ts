@@ -53,8 +53,8 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       "B": "Blue",
       "Y": "Yellow"
     }
-    for (const c of pawnColor) {
-      [1, 2, 3, 4].forEach((v) => {
+    for (const c of pawnColor){
+      [1, 2, 3, 4].forEach((v) =>{
         const pId = `${c}P${v}`; // pawn id 
         const color = mapColor[c]
         const pawn = { pId, position: pId, isHome: true, isFinished: false, color: color as colors }; // pawn value
@@ -73,7 +73,7 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     const globaLBoard = get().boardMap;
     const getPawnPath = getPathOfPawn({ currentTurn: currentTurn as any });
 
-    if (!currnetTurnPawns.has(pawnId)) {
+    if (!currnetTurnPawns.has(pawnId)){
       // console.log("You can't move the pawn");
       return;
     }

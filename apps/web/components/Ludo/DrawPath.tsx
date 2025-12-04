@@ -49,10 +49,10 @@ export const DrawPath = ({
           >
             {(safePlace[0] == p || safePlace[1] == p) && (
               <span>
-                <FiStar size={20} />{" "}
+                <FiStar size={20} />
               </span>
-            )}  
-            {pawns.map((i) => (i.position === p ? <Pawn key={i.pId} id={i.pId} /> : null))}
+            )}   
+            {pawns.map((i) => (i.position === p ? <Pawn key={i.pId} id={i.pId} color={i.color}/> : null))}
           </div>
         );
       })}
