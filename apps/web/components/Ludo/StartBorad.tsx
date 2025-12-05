@@ -8,7 +8,7 @@ interface homeType {
 }
 
 export const StartBorad = ({ bgColor, pawnHome }: homeType) => {
-  const { pawnMap } = useGameStore(); 
+  const { pawnMap, moveablePawn } = useGameStore();
   return (
     <div className="w-[65%] p-2 rounded-sm h-[65%] bg-zinc-50">
       <div className=" h-full w-full flex items-center justify-between flex-wrap  ">
@@ -19,8 +19,15 @@ export const StartBorad = ({ bgColor, pawnHome }: homeType) => {
               key={i}
             >
               {pawnMap.get(i)?.position === i && (
-                <Pawn key={i} id={i} size={60} color={pawnMap.get(i)?.color}/>
-              ) }
+                <Pawn
+                  key={i}
+                  id={i}
+                  size={50}
+                  color={pawnMap.get(i)?.color as string}
+                  isActive={moveablePawn.has(i)} 
+                  isFinished={pawnMap.get(i)?.isFinished ?? false}
+                />
+              )}
             </div>
           );
         })}

@@ -9,7 +9,7 @@ import { pawn, useGameStore } from "@/state/gameStore";
 import { Pawn } from "./Pawn";
 
 interface prop {
-  path: string[];
+  path: string[]; 
   safePlace: redSafePlace | greenSafePlace | yellowSafePlace | blueSafePlace;
   pathname: string;
   drawBgColorOnPath: string[];
@@ -25,9 +25,7 @@ export const DrawPath = ({
   color,
 }: prop) => {
   const coloured = new Set(drawBgColorOnPath);
-  const { pawnMap, boardMap } = useGameStore(); 
-  console.log("pawnMap",pawnMap) 
-  console.log("board",boardMap)
+  const { pawnMap, boardMap ,moveablePawn} = useGameStore();
   return (
     <>
       {path.map((p: string, i: number) => {
@@ -51,9 +49,12 @@ export const DrawPath = ({
               <span>
                 <FiStar size={20} />
               </span>
-            )}   
-            {pawns.map((i) => (i.position === p ? <Pawn key={i.pId} id={i.pId} color={i.color}/> : null))}
-          </div>
+            )} 
+            {pawns.map((i) =>
+              i.position === p ? ( 
+                <Pawn key={i.pId} id={i.pId} color={i.color} isFinished={i.isFinished}  isActive={moveablePawn.has(i.pId)}/>
+              ) : null
+            )}</div>
         );
       })}
     </>

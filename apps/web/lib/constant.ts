@@ -57,7 +57,7 @@ export const blueBoardPath = [
   "B3",
   "BW3",
   "Y8",
-  "B3",
+  "B2",
   "BW2",
   "Y9",
   "B1",

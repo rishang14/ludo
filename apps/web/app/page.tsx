@@ -19,10 +19,12 @@ import {
   globaLBoard 
 } from "@/lib/constant"; 
 import { useGameStore } from "@/state/gameStore";
+import WinZone from "@/components/Ludo/WinZone";
 
 export default function Page() {  
 
-const {initGameBoard,currTurn,diceVal,moveablePawn,pawnMap}=useGameStore();  
+const {initGameBoard,currTurn,diceVal,moveablePawn}=useGameStore();
+console.log(moveablePawn,"movable-pawn") 
 useEffect(()=>{
 initGameBoard()
 },[])
@@ -62,7 +64,9 @@ initGameBoard()
             className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
           />
         </div>
-        <div className="win-zone rounded-sm bg-zinc-50  border-t-0 border-r-0 border-b-[0.25px] border-l-[.25px] border-slate-950"></div>
+        <div className="win-zone rounded-sm bg-zinc-50  border-t-0 border-r-0 border-b-[0.25px] border-l-[.25px] border-slate-950">
+          <WinZone/>
+        </div>
         <div className="blue-board rounded-sm  flex items-center justify-center bg-blue-500/70">
           <StartBorad bgColor="bg-blue-500"  pawnHome={bluePawnHome} />
         </div>

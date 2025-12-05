@@ -22,12 +22,14 @@ const diceMap: Record<number, any> = {
 
 export const Dice = () => {  
 
-  const {diceVal,rollDice}=useGameStore()
+  const {diceVal,rollDice,canDiceRoll}=useGameStore()
   return (
-    <div
-      onClick={(e) => {
+    <div 
+      onClick={(e) => { 
         e.stopPropagation();
-        rollDice();
+        if(canDiceRoll){
+          rollDice();
+        }
       }}
       className="flex cursor-pointer  transform ease-in-out rounded-md bg-neutral-900  text-white"
     >
