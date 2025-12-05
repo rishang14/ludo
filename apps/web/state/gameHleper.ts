@@ -9,7 +9,7 @@ type calcMoveReturn = {
   isHome: boolean;
 };
 
-export const getPathOfPawn = (  {color}:{color:color}) => {
+export const getPathOfPawn = (  {color}:{color:color}):string[] => {
   const path: Record<string, any> = {
     Red: redPath,
     Green: greenPath,
@@ -37,8 +37,6 @@ export const calcMove = (
   const currentPos = pawnPath.indexOf(currPawn?.position);
   const totalSize = pawnPath.length;
   if (currentPos + diceVal < totalSize) {
-    console.log("Next cell value", pawnPath[currentPos + diceVal]);
-    console.log("dice value", diceVal);
     return {
       newPos: pawnPath[currentPos + diceVal] as string,
       pathAcheived: false,
@@ -46,7 +44,7 @@ export const calcMove = (
     };
   } else if (currentPos + diceVal == totalSize) {
     return {
-      newPos: "",
+      newPos: "", 
       pathAcheived: true,
       isHome: false,
     };
@@ -56,10 +54,16 @@ export const calcMove = (
 };
 
 
-//i am calculating the movable pawn as per the dice val that if is in home and not 6 then not gonna put it and if its outside  
-//  then put it in the set  and if 6 then even home one is also allowed to move   
-// by current func i am getting 
-// movable pawn ->set which conatins id of the pawns  
-// diceval 
-// able to know that if the previous and current val of the pawn is same then  just  dont switch the turn  -> improvement needed here 
-// and in the getmovable pawn -> here 
+
+
+
+
+// now i have to implement  kill logic  basically 
+// thing if it is safe place no kill  happen 
+// if it is of same pId no kill 
+//  what i have at this point is  
+// i can calcMove and send pawn to one place to another place   what  i have to do now is 
+// if the place where curr pawn is going  there is already someone on that place which is not from the same team then i just have to send the one 
+// who is at destination to the home and move currpawn to their pos but if it is safe place leave it nothing you have to do 
+// and then curr chance will be of same team rolldice should become true  
+// if its of same team then don't do anything 

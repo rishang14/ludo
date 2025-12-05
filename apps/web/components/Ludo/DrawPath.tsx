@@ -10,7 +10,7 @@ import { Pawn } from "./Pawn";
 
 interface prop {
   path: string[]; 
-  safePlace: redSafePlace | greenSafePlace | yellowSafePlace | blueSafePlace;
+  safePlace?: redSafePlace | greenSafePlace | yellowSafePlace | blueSafePlace;
   pathname: string;
   drawBgColorOnPath: string[];
   className: string;
@@ -19,13 +19,12 @@ interface prop {
 
 export const DrawPath = ({
   path,
-  safePlace,
   className,
   drawBgColorOnPath,
   color,
 }: prop) => {
   const coloured = new Set(drawBgColorOnPath);
-  const { pawnMap, boardMap ,moveablePawn} = useGameStore();
+  const { pawnMap, boardMap ,moveablePawn,safePlace} = useGameStore(); 
   return (
     <>
       {path.map((p: string, i: number) => {
@@ -45,11 +44,11 @@ export const DrawPath = ({
             className={`${className} flex items-center justify-center relative `}
             style={{ backgroundColor: coloured.has(p) ? color : undefined }}
           >
-            {(safePlace[0] == p || safePlace[1] == p) && (
+            {(safePlace.has(p)) && (
               <span>
                 <FiStar size={20} />
               </span>
-            )} 
+            )}  
             {pawns.map((i) =>
               i.position === p ? ( 
                 <Pawn key={i.pId} id={i.pId} color={i.color} isFinished={i.isFinished}  isActive={moveablePawn.has(i.pId)}/>

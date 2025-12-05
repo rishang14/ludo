@@ -1,6 +1,7 @@
-import { globaLBoard } from "@/lib/constant";
+import { globaLBoard, globalSafePlace } from "@/lib/constant";
 import { create } from "zustand";
 import { calcMove, getPathOfPawn } from "./gameHleper";
+import { stringify } from "querystring";
 
 type colors = "Red" | "Blue" | "Green" | "Yellow";
 export type pawn = {
@@ -23,6 +24,8 @@ interface gameBoard {
   initGameBoard: () => void;
   getMovablePawn: (diceVal: number) => string[];
   diceVal: number;
+  safePlace: Set<string>;
+  capturePawn: (newPos: string, currentpawn: pawn) => boolean;
   movePawn: (pawnId: string) => void;
   rollDice: () => void;
 }
@@ -30,6 +33,7 @@ interface gameBoard {
 export const useGameStore = create<gameBoard>()((set, get) => ({
   pawnMap: new Map(),
   boardMap: new Map(),
+  safePlace: new Set(),
   canDiceRoll: true,
   canPawnMove: false,
   diceVal: 1,
@@ -40,7 +44,7 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
   initGameBoard: () => {
     const pawnMap = new Map<string, pawn>();
     const boardMap = new Map<string, Set<string>>();
-
+    const safePlace = new Set<string>();
     globaLBoard.flatMap((cell) => {
       //board is ready with all the cell with empty set
       for (let val of cell) {
@@ -48,6 +52,10 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       }
     });
     // Currently this start with assuming 4 player in the match make it customizable
+
+    for (const p of globalSafePlace) {
+      safePlace.add(p);
+    }
 
     let pawnColor = ["R", "G", "B", "Y"];
     let mapColor: Record<string, string> = {
@@ -71,16 +79,46 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
         boardMap.get(pId)?.add(pId); //pawn is placed inside the main map
       });
     }
-    set({ pawnMap, boardMap });
+    set({ pawnMap, boardMap, safePlace });
+  },
+
+  capturePawn: (newPos, currentpawn): boolean => {
+    const boardMap = new Map(get().boardMap);
+    const allpawn = new Map(get().pawnMap);
+    const pawnsAtNewPos = boardMap.get(newPos);
+    if (!pawnsAtNewPos || pawnsAtNewPos.size === 0) {
+      console.log("No pawn are available");
+      return false;
+    }
+    console.log("cell value whith pawn set:", pawnsAtNewPos);
+    for (let p of pawnsAtNewPos) {
+      if (p.charAt(0) === currentpawn.pId.charAt(0)) return false;
+      const capturedpawn = allpawn.get(p);
+      console.log("pawn to be kill of pawn id", p);
+      // console.log(" that pawn  ",capturedpawn);
+      if (!capturedpawn) return false;
+      allpawn.set(capturedpawn.pId, {
+        ...capturedpawn,
+        isHome: true,
+        position: capturedpawn.pId,
+      });
+      boardMap.get(p)?.add(p);
+      boardMap.get(newPos)?.delete(p);
+    }
+    boardMap.get(newPos)?.add(currentpawn.pId);
+    allpawn.set(currentpawn.pId, { ...currentpawn, position: newPos });
+
+    set({ pawnMap: allpawn, boardMap, canDiceRoll: true });
+    return true;
   },
 
   movePawn: (pawnId: string) => {
     set({ canDiceRoll: true });
     const currnetTurnPawns = get().moveablePawn;
     const diceVal = get().diceVal;
-    const allpawn = get().pawnMap;
-    const currentTurn = get().currTurn; 
-    const globaLBoard = get().boardMap;
+    const allpawn = new Map(get().pawnMap);
+    const currentTurn = get().currTurn;
+    const globaLBoard = new Map(get().boardMap);
     const getPawnPath = getPathOfPawn({ color: currentTurn as any });
     if (!currnetTurnPawns.has(pawnId)) {
       // console.log("You can't move the pawn");
@@ -93,10 +131,20 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       currPawn,
       diceVal
     );
+
+    if (!get().safePlace.has(newPos)) {
+      const captured = get().capturePawn(newPos, currPawn);
+      if (captured) {
+        console.log("returned from here");
+        return;
+      }
+    }
+
     if (currPawn.position === newPos) {
       set({ canPawnMove: true });
       return;
     }
+
     if (pathAcheived) {
       allpawn.set(currPawn.pId, { ...currPawn, isFinished: true, isHome }); //  it is winner
       globaLBoard.get(currPawn.position)?.delete(currPawn.pId); // remove this pawn from the gloabal paht
@@ -124,10 +172,10 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     set({ currTurn: nextTurn });
   },
 
-  getMovablePawn: (diceVal: number,) => {
-    const currentTurnPawnPos: string[] = []; 
-    const turn=get().currTurn 
-    const pawnPath = getPathOfPawn( {color:turn as any}); 
+  getMovablePawn: (diceVal: number) => {
+    const currentTurnPawnPos: string[] = [];
+    const turn = get().currTurn;
+    const pawnPath = getPathOfPawn({ color: turn as any });
     for (let i = 1; i <= 4; i++) {
       const pId = `${turn.charAt(0)}P${i}`;
       const pawn = get().pawnMap.get(pId);
@@ -139,7 +187,7 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
         }
         continue;
       }
-      
+
       if (!pawn?.isFinished) {
         const { newPos } = calcMove(pawnPath, pawn, diceVal);
         if (newPos != pawn.position) {
@@ -152,10 +200,8 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
   },
 
   rollDice: () => {
-    const diceVal = Math.floor(Math.random()*6)+1;
-    const currentTurn = get().currTurn.charAt(0);
-    let currentTurnPawnPos: string[] = get().getMovablePawn(
-      diceVal  );
+    const diceVal = Math.floor(Math.random() * 6) + 1;
+    let currentTurnPawnPos: string[] = get().getMovablePawn(diceVal);
 
     set({ canPawnMove: true });
     const movable = get().moveablePawn;
@@ -165,12 +211,12 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       set({ diceVal });
       get().nextTurn();
       return;
-    }   
+    }
     currentTurnPawnPos.forEach((v) => movable.add(v));
 
-    if(currentTurnPawnPos.length===1){
-      set({diceVal,moveablePawn:movable,canDiceRoll:false}) 
-      get().movePawn(currentTurnPawnPos[0] as string) 
+    if (currentTurnPawnPos.length === 1) {
+      set({ diceVal, moveablePawn: movable, canDiceRoll: false });
+      get().movePawn(currentTurnPawnPos[0] as string);
       return;
     }
 
