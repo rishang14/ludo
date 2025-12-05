@@ -165,9 +165,15 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       set({ diceVal });
       get().nextTurn();
       return;
+    }   
+    currentTurnPawnPos.forEach((v) => movable.add(v));
+
+    if(currentTurnPawnPos.length===1){
+      set({diceVal,moveablePawn:movable,canDiceRoll:false}) 
+      get().movePawn(currentTurnPawnPos[0] as string) 
+      return;
     }
 
-    currentTurnPawnPos.forEach((v) => movable.add(v));
     // this is pushing into movable item
     set({ diceVal, moveablePawn: movable, canDiceRoll: false });
     return;
