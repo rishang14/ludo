@@ -1,7 +1,7 @@
 import { globaLBoard, globalSafePlace } from "@/lib/constant";
 import { create } from "zustand";
 import { calcMove, getPathOfPawn } from "./gameHleper";
-import { stringify } from "querystring";
+
 
 type colors = "Red" | "Blue" | "Green" | "Yellow";
 export type pawn = {
