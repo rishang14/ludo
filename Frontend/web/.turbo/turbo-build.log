@@ -1,0 +1,30 @@
+[?9001h[?1004h[?25l[2J[m[2;1H> web@1.0.0 build C:\Ludo\ludo\apps\web
+> next build[5;1H]0;C:\WINDOWS\system32\cmd.exe[?25h[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+   [38;2;173;127;168m[1m▲ Next.js 16.0.1[m (Turbopack)
+
+ [37m[1m [m Creating an optimized production build ...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ [32m[1m✓[m Compiled successfully in 4.0s
+ [37m[1m [m Skipping validation of types
+[?25l [37m[1m [m Collecting page data  [36m.[m[K[115C [37m[1m [m Collecting page data  [36m..[m[baseline-browser-mapping] The data in this module is over two months old.  To ensure ac
+[10;115Hccurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`[36C
+[115C [37m[1m [m Collecting page data  [36m...[m[baseline-browser-mapping] The data in this module is over two months old.  To ensure a
+[10;115Haccurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`[35C
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, pleas
+[10;115Hse update: `npm i baseline-browser-mapping@latest -D`[63C
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, pleas
+[10;115Hse update: `npm i baseline-browser-mapping@latest -D`[63C
+[115C[K[115C [37m[1m [m Collecting page data  [36m.[m[K[115C [37m[1m [m Collecting page data  [36m..[m[K[115C [32m[1m✓[m Collecting page data in 1040.8ms[K[?25h
+[?25l [37m[1m [m Generating static pages (0/4)  [36m[    ][m[K[115C [37m[1m [m Generating static pages (0/4)  [36m[=   ][m[K[115C[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, pleas[?25h
+[10;115Hse update: `npm i baseline-browser-mapping@latest -D`
+ [32m[1m✓[m Generating static pages (4/4) in 1009.7ms
+[?25l [37m[1m [m Finalizing page optimization  [36m.[m [32m[1m✓[m Finalizing page optimization in 28.9ms[K[?25h
+
+[4mRoute (app)[24m[K
+┌ ○ /
+└ ○ /_not-found
+
+
+○  (Static)  prerendered as static content
+
+[?9001l[?1004l
