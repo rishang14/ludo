@@ -1,5 +1,5 @@
-import express, { type Request, type Response } from "express"  
-
+import * as express  from "express"; 
+import type {Request,Response} from "express"
 
 const app=express(); 
 
