@@ -1,32 +1,29 @@
-import  express from "express";
+import express from "express";
 import type { NextFunction, Request, Response } from "express";
-import { toNodeHandler,fromNodeHeaders } from "better-auth/node"; 
-import  cors from "cors" 
-import http from "http"
+import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
+import cors from "cors";
+import http from "http";
 import { auth } from "./lib/auth";
 import { RealTime } from "./services/ws/realTime";
 import { RedisInstance } from "./services/redis/redisClient";
 
-export const app = express();   
-export const server=http.createServer(app);  
-export const ws = new RealTime(server); 
+export const app = express();
+export const server = http.createServer(app);
+export const ws = new RealTime(server);
 
 app.use(
   cors({
-    origin: "http://localhost:3000", 
-    methods: ["GET", "POST", "PUT", "DELETE"], 
-    credentials: true, 
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
 
-app.all("/api/auth/*splat", toNodeHandler(auth));   
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
-
-
-try {   
-   await  RedisInstance.initialize() 
-   console.log("hello")
-} catch (error:any) {
+try {
+  await RedisInstance.initialize();
+} catch (error: any) {
   console.error(" Database or Redis connection failed:", error.message);
   process.exit(1); // Exit if DB or Redis fails
 }
@@ -35,18 +32,16 @@ app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("hello").status(200);
-});   
-
-
-app.get("/api/me", async (req:Request, res:Response) => {
- 	const session = await auth.api.getSession({
-      headers: fromNodeHeaders(req.headers),
-    });
-	return res.json(session);
 });
 
+app.get("/api/me", async (req: Request, res: Response) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
+  return res.json(session);
+});
 
-app.use((err:any, req:Request, res:Response, next:NextFunction) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(" Global error caught:", err);
   res.status(err.status || 500).json({
     success: false,

@@ -1,5 +1,5 @@
 import { createClient, type RedisClientType } from "redis";
-import { redisConfig } from "../../../utils/redisConfig";
+import { redisConfig } from "../../utils/redisConfig";
 
 export class RedisInstance {
   private static  client: RedisClientType | null=null;
