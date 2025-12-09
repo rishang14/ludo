@@ -11,9 +11,11 @@ export const auth = betterAuth({
     provider: 'postgresql',
   }),
    socialProviders:{
-    "google":{
+    "google":{ 
+        prompt: "select_account",
         clientId:process.env.CLIENT_ID! , 
-        clientSecret : process.env.CLIENT_SECRET!, 
+        clientSecret : process.env.CLIENT_SECRET!,  
+        redirectURI:"http://localhost:8000/api/auth/callback/google"
     }
    }, 
   // optionally add trusted origins for CORS
