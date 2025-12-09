@@ -5,6 +5,7 @@ import  cors from "cors"
 import http from "http"
 import { auth } from "./lib/auth";
 import { RealTime } from "./services/ws/realTime";
+import { RedisInstance } from "./services/redis/redisClient";
 
 export const app = express();   
 export const server=http.createServer(app);  
@@ -21,6 +22,14 @@ app.use(
 app.all("/api/auth/*splat", toNodeHandler(auth));   
 
 
+
+try {   
+   await  RedisInstance.initialize() 
+   console.log("hello")
+} catch (error:any) {
+  console.error(" Database or Redis connection failed:", error.message);
+  process.exit(1); // Exit if DB or Redis fails
+}
 
 app.use(express.json());
 
@@ -53,8 +62,4 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled Rejection:", reason);
   process.exit(1);
-});
-
-app.listen(8000, () => {
-  console.log("sever listening on port 8000");
 });
