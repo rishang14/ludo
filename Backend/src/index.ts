@@ -1,16 +1,20 @@
 import  express from "express";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { toNodeHandler,fromNodeHeaders } from "better-auth/node"; 
-import  cors from "cors"
+import  cors from "cors" 
+import http from "http"
 import { auth } from "./lib/auth";
+import { RealTime } from "./services/ws/realTime";
 
-const app = express();   
+export const app = express();   
+export const server=http.createServer(app);  
+export const ws = new RealTime(server); 
 
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your frontend's origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
-    credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+    origin: "http://localhost:3000", 
+    methods: ["GET", "POST", "PUT", "DELETE"], 
+    credentials: true, 
   })
 );
 
@@ -30,6 +34,25 @@ app.get("/api/me", async (req:Request, res:Response) => {
       headers: fromNodeHeaders(req.headers),
     });
 	return res.json(session);
+});
+
+
+app.use((err:any, req:Request, res:Response, next:NextFunction) => {
+  console.error(" Global error caught:", err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
+process.on("uncaughtException", (err) => {
+  console.error(" Uncaught Exception:", err);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+  process.exit(1);
 });
 
 app.listen(8000, () => {

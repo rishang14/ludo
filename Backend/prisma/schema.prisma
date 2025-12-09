@@ -13,15 +13,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String       @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean      @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  onGoingGame   String?
+  wins          Int          @default(0)
+  lost          Int          @default(0)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   sessions      Session[]
   accounts      Account[]
+  GamePlayers   GamePlayer[]
 
   @@unique([email])
   @@map("user")
@@ -73,4 +77,25 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Game {
+  id          String       @id @default(cuid())
+  type        Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  GamePlayers GamePlayer[]
+
+  @@map("game")
+}
+
+model GamePlayer {
+  id       String   @id @default(cuid())
+  gameId   String
+  userId   String?
+
+  Game Game  @relation(fields: [gameId], references: [id])
+  User User? @relation(fields: [userId], references: [id])
+
+  @@map("game_player")
 }

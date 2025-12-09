@@ -6,7 +6,8 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "allowImportingTsExtensions": true, 
+    "allowImportingTsExtensions": true,  
+    "allowSyntheticDefaultImports":true,
     "noEmit": true,
     // For nodejs:
     "lib": ["esnext"],
