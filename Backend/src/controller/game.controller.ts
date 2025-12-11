@@ -33,12 +33,11 @@ export const initGame = async (req: Request, res: Response) => {
 
     await GameManager.initBoard(gameCreated.playerIds, gameCreated.id);
 
-    const wholeGame = await GameManager.getWholeGameState(gameCreated.id);
 
     return res
       .status(201)
       .json(
-        new ApiResponse(201, wholeGame, "Game Initialised Successfully", true)
+        new ApiResponse(201, gameCreated, "Game Initialised Successfully", true)
       );
   } catch (error: any) {
     return res

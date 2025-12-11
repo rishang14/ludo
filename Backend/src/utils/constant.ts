@@ -1,4 +1,5 @@
 import { start } from "repl";
+import type { backBone } from "../dto/game.dto";
 
 export const redBoardPath = [
   "B13",
@@ -343,7 +344,7 @@ export const greenPawnPathToWin = [
 ];
 
 type kit={
-  key:string,
+  key:backBone,
   value:any
 }
 
@@ -360,7 +361,7 @@ export const gameStarterkit:kit[]= [
     value:false, 
   }, 
   {
-    key:"movablePawn", 
+    key:"movablePawns", 
     value:[]
   }, 
   {
@@ -368,7 +369,7 @@ export const gameStarterkit:kit[]= [
     value:""
   },  
   {
-    key:"winnderOrder",
+    key:"winnerOrders",
     value:[]
   } 
 ]

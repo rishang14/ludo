@@ -1,6 +1,6 @@
 import { createClient, type RedisClientType } from "redis";
 import { redisConfig } from "../../utils/redisConfig";
-import type { pawn, updatePawn } from "../../dto/game.dto";
+import type { backBone, pawn, updatePawn } from "../../dto/game.dto";
 
 export class RedisInstance {
   private static client: RedisClientType | null = null;
@@ -154,7 +154,7 @@ export class RedisInstance {
 
   public static async updateBoardState(
     gameId: string,
-    details: string,
+    details: backBone,
     val: any
   ) {
     if (!this.client) {

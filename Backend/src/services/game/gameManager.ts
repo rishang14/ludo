@@ -1,4 +1,4 @@
-import type { colors, pawn } from "../../dto/game.dto";
+import type { backBone, colors, pawn } from "../../dto/game.dto";
 import {
   dirstributePawn,
   gameStarterkit,
@@ -7,12 +7,21 @@ import {
 } from "../../utils/constant";
 import { RedisInstance } from "../redis/redisClient";
 
-export class GameManager {
+export class GameManager { 
+
+ private static totalPlayer:number=0;
+ private static turnArray:Set<string>= new Set();
+
   public static async initBoard(totlPlayerIds: string[], gameId: string) {
-    //game pawn
+    //game pawn    
+    if(!totlPlayerIds.length || !gameId){
+      throw new Error("GameIds with totalPlayerIds are required"); 
+    }
+    this.totalPlayer=totlPlayerIds.length;
     for (let i = 0; i < totlPlayerIds.length; i++) {
-      for (const p of dirstributePawn[i]!) {
-        const pawn: pawn = {
+      for (const p of dirstributePawn[i]!) { 
+        this.turnArray.add(totlPlayerIds[i]!) 
+        const pawn: pawn ={
           pId: p,
           position: p,
           isFinished: false,
@@ -32,8 +41,13 @@ export class GameManager {
     }
 
     //gameStarterkit
-    for (const p of gameStarterkit) {
-      await RedisInstance.updateBoardState(gameId, p.key, p.value);
+    for (const p of gameStarterkit){
+      if (p.key === "currentTurn") { 
+        this.turnArray?.add(totlPlayerIds[0]!);
+        await RedisInstance.updateBoardState(gameId, p.key, totlPlayerIds[0]);
+      } else {
+        await RedisInstance.updateBoardState(gameId, p.key, p.value);
+      }
     }
   }
 
@@ -47,5 +61,7 @@ export class GameManager {
       globaLBoardMap: board,
       gameBackbone: gameStatus,
     };
-  }
+  }      
+     
+  
 }
