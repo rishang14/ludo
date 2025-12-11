@@ -7,7 +7,8 @@ type colors = "Red" | "Blue" | "Green" | "Yellow";
 export type pawn = {
   pId: string;
   position: string;
-  isHome: boolean;
+  isHome: boolean; 
+  userId:string
   isFinished: boolean;
   color: colors;
 };
@@ -72,7 +73,8 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
           pId,
           position: pId,
           isHome: true,
-          isFinished: false,
+          isFinished: false, 
+          userId:"",
           color: color as colors,
         }; // pawn value
         pawnMap.set(pId, pawn); // pawn is placed in pawn map for all board

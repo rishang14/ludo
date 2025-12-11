@@ -24,6 +24,39 @@ export const initGameSchema = z
     message: "Emails count must match totalPlayers",
     path: ["emails"],
   });
- 
 
-export const validId= z.cuid({error:"Invlalid Cuid"});
+export const validId = z.cuid({ error: "Invlalid Cuid" });
+
+export type colors = "Red" | "Blue" | "Green" | "Yellow";
+export type pawn = {
+  pId: string;
+  position: string;
+  isHome: boolean;
+  userId: string;
+  isFinished: boolean;
+  color: colors;
+};
+
+export type updatePawn = {
+  position: string;
+  isHome: boolean;
+  isFinished: boolean;
+};
+
+export type allpawns =
+    "YP1"
+  | "YP2"
+  | "YP3"
+  | "YP4"
+  | "BP1"
+  | "BP2"
+  | "BP3"
+  | "BP4"
+  | "GP1"
+  | "GP2"
+  | "GP3"
+  | "GP4"
+  | "RP1"
+  | "RP2"
+  | "RP3"
+  | "RP4";
