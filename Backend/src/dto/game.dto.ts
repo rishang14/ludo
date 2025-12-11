@@ -26,9 +26,13 @@ export const initGameSchema = z
   });
 
 export const validId = z.cuid({ error: "Invlalid Cuid" });
+export type kit={
+  key:backBone,
+  value:any
+} 
 
 export type colors = "Red" | "Blue" | "Green" | "Yellow"; 
-export type backBone= "diceVal" | "canDiceRoll" | "movablePawns" | "currentTurn" | "winnerOrders" | "canPawnMove"
+export type backBone= "diceVal" | "canDiceRoll" | "movablePawns" | "currentTurn" | "winnerOrders" | "canPawnMove" | "currentUserTurn"
 export type pawn = {
   pId: string;
   position: string;

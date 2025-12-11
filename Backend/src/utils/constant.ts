@@ -1,5 +1,5 @@
 import { start } from "repl";
-import type { backBone } from "../dto/game.dto";
+import type { backBone, colors, kit } from "../dto/game.dto";
 
 export const redBoardPath = [
   "B13",
@@ -220,7 +220,7 @@ export const bluePawnPathToWin = [
   "BW4",
   "BW5",
 ];
-export const mapColor: Record<string, string> = {
+export const mapColor: Record<string, colors> = {
   R: "Red",
   G: "Green",
   B: "Blue",
@@ -343,10 +343,7 @@ export const greenPawnPathToWin = [
   "GW5",
 ];
 
-type kit={
-  key:backBone,
-  value:any
-}
+
 
 export const gameStarterkit:kit[]= [
   {
@@ -365,11 +362,14 @@ export const gameStarterkit:kit[]= [
     value:[]
   }, 
   {
-    key:"currentTurn", 
+    key:"currentUserTurn", 
     value:""
   },  
   {
     key:"winnerOrders",
     value:[]
+  },{ 
+  key:"currentTurn", 
+  value:"" 
   } 
 ]
