@@ -65,3 +65,15 @@ export type allpawns =
   | "RP2"
   | "RP3"
   | "RP4";
+ 
+export type calcMoveReturn = {
+  newPos: string;
+  pathAcheived: boolean;
+  isHome: boolean;
+};  
+
+
+export  type capturedReturnType={
+  captruedSuccess:boolean, 
+  capturedPawn:string|null
+}

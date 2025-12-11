@@ -1,5 +1,4 @@
-import { start } from "repl";
-import type { backBone, colors, kit } from "../dto/game.dto";
+import type {  colors, kit } from "../dto/game.dto";
 
 export const redBoardPath = [
   "B13",
@@ -85,7 +84,7 @@ export const yellowBoardPath = [
   "G13",
 ];
 
-export const globalSafePlace = ["G1", "R1", "Y1", "B1", "G8", "Y8", "B8", "R8"];
+export const globalSafePlace:Set<string> =new Set(["G1", "R1", "Y1", "B1", "G8", "Y8", "B8", "R8"]);
 
 export type redSafePlace = ["R1", "B8"];
 export type blueSafePlace = ["B1", "Y8"];
@@ -372,4 +371,12 @@ export const gameStarterkit:kit[]= [
   key:"currentTurn", 
   value:"" 
   } 
-]
+]  
+
+
+export const pathToWin: Record<colors, string[]> = {
+    Red: redPawnPathToWin,
+    Green: greenPawnPathToWin,
+    Blue: bluePawnPathToWin,
+    Yellow: yellowPawnPathToWin,
+  };

@@ -1,13 +1,16 @@
-import { pid } from "process";
-import type { backBone, colors, kit, pawn } from "../../dto/game.dto";
+import { json } from "express";
+import type { backBone, capturedReturnType, colors, pawn } from "../../dto/game.dto";
 import {
   dirstributePawn,
   gameStarterkit,
   globaLBoard,
+  globalSafePlace,
   mapColor,
+  pathToWin,
 } from "../../utils/constant";
 import { RedisInstance } from "../redis/redisClient";
 import { useId } from "react";
+import { calcMove } from "../../lib/helper";
 
 export class GameManager {
   public static totalPlayer: number = 0;
@@ -52,6 +55,12 @@ export class GameManager {
     for (const p of gameStarterkit) {
       if (p.key === "currentUserTurn") {
         await RedisInstance.updateBoardState(gameId, p.key, totlPlayerIds[0]);
+      } else if (p.key === "currentTurn") {
+        await RedisInstance.updateBoardState(
+          gameId,
+          p.key,
+          this.userIdWithColor.get(totlPlayerIds[0]!)
+        );
       } else {
         await RedisInstance.updateBoardState(gameId, p.key, p.value);
       }
@@ -119,7 +128,7 @@ export class GameManager {
     movablePawns: string[],
     diceVal: number,
     userId: string
-  ){
+  ) {
     const canMove = movablePawns.length > 0;
     const turn = this.calcNextTurn(userId);
     const color = this.userIdWithColor.get(turn!);
@@ -137,7 +146,7 @@ export class GameManager {
 
   public static async rollDice(gameId: string, userId: string) {
     const gameState = await RedisInstance.getGameStatus(gameId);
-    if (gameState.userId !== userId) {
+    if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
     const diceVal = this.generateDiceVal();
@@ -154,17 +163,50 @@ export class GameManager {
       await RedisInstance.updateBoardState(gameId, key as backBone, value);
     }
     return newBackBone;
-  }       
-
-
-  private static async calcNewPos(diceVal:string,pawn:pawn){
-  }      
-  
-  private static async caputrePawn(diceVal:string,pawn:pawn){
   }
 
+  private static async calcNewPos(diceVal: string, pawn: pawn) {}
+
+  private static async capturePawn(newPos: string, currPawn: pawn,gameId:string):Promise<capturedReturnType> {
+  const board:string[] = await RedisInstance.getOneBoardCell(gameId,newPos);  
   
-  public static async movePawn(gameId:string,userId:String,pId:string){
-     
+  if(board.length===0){
+    return {captruedSuccess:false,capturedPawn:null}; 
+  } 
+    for(const p of board){
+      if(p.charAt(0)===currPawn.pId.charAt(0)){
+        return {captruedSuccess:false,capturedPawn:null}
+      }
+    }
+
   }
+
+  public static async movePawn(gameId: string, userId: String, pId: string) {
+    const gameState = await RedisInstance.getGameStatus(gameId);
+    const movablePawns:string[] = JSON.parse(gameState.movablePawns!);
+    const diceVal = JSON.parse(gameState.diceVal!);
+    const color = JSON.parse(gameState.currentTurn!);
+    const pawnPath: string[] = pathToWin[color as colors];
+    if (JSON.parse(gameState.currentUserTurn!) !== userId) {
+      throw new Error("Invalid User turn");
+    }
+    const currPawn: pawn = await RedisInstance.getOnePawn(gameId, pId);  
+    if(!movablePawns.includes(pId)){
+      return ;
+    }   
+
+    const  {newPos,pathAcheived,isHome}=calcMove(pawnPath,currPawn,+diceVal);   
+     let captured:string | null 
+     let pawnWon:string|null 
+     let currPawnNewPos:string|null   
+      if(!globalSafePlace.has(newPos)){
+        const {capturedPawn, captruedSuccess}= await this.capturePawn(newPos,currPawn,gameId); 
+        if(captruedSuccess){
+          captured=capturedPawn
+        } 
+      }    
+      if(pathAcheived){
+         await RedisInstance.updatePawnVlalue(gameId,currPawn.pId,{...currPawn,isFinished:true,isHome})
+      }
+   }
 }
