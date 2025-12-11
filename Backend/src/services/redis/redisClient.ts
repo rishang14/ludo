@@ -29,6 +29,8 @@ export class RedisInstance {
 
     this.client.on("connect", () => {
       console.log("redis is connected ");
+
+
     });
 
     this.client.on("error", (err) => {
@@ -61,8 +63,7 @@ export class RedisInstance {
     if (!pawns) {
       throw new Error("Pawn Not found for this gameId");
     }
-    console.log("allpawns of the game", pawns);
-
+   
     return pawns;
   }
 
@@ -76,7 +77,7 @@ export class RedisInstance {
       pawnVal.pId,
       JSON.stringify(pawnVal)
     );
-    console.log("pawnStored: ", pawnVal.pId);
+   
   }
 
   public static async updatePawnVlalue(
@@ -108,7 +109,7 @@ export class RedisInstance {
     }
     const key = this.boardKey(gameId);
     const board = await this.client.HSET(key, cellId, JSON.stringify(cellval));
-    console.log("board stored:", cellId);
+    
   }
 
   public static async getFullBoard(gameId: string) {
@@ -161,10 +162,10 @@ export class RedisInstance {
     }
     const key = this.boardState(gameId);
     const state = await this.client.hSet(key, details, JSON.stringify(val));
-    console.log("State value done:", state);
+  
   }
 
-  public static async getAllGameState(gameId: string) {
+  public static async getGameStatus(gameId: string) {
     if (!this.client) {
       throw new Error("Redis is not connected");
     }

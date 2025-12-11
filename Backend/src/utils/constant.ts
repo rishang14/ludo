@@ -1,3 +1,5 @@
+import { start } from "repl";
+
 export const redBoardPath = [
   "B13",
   "R1",
@@ -339,3 +341,34 @@ export const greenPawnPathToWin = [
   "GW4",
   "GW5",
 ];
+
+type kit={
+  key:string,
+  value:any
+}
+
+export const gameStarterkit:kit[]= [
+  {
+    key:"diceVal", 
+    value:1
+  }, 
+  {
+    key:"canDiceRoll",
+    value:false, 
+  }, {
+    key:"canPawnMove",
+    value:false, 
+  }, 
+  {
+    key:"movablePawn", 
+    value:[]
+  }, 
+  {
+    key:"currentTurn", 
+    value:""
+  },  
+  {
+    key:"winnderOrder",
+    value:[]
+  } 
+]

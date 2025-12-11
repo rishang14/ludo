@@ -8,8 +8,8 @@ import { UserRepo } from "../repositry/user.repositry";
 import { GameManager } from "../services/game/gameManager";
 
 export const initGame = async (req: Request, res: Response) => {
-  try {  
-    console.log(req.body,"body of init game")
+  try {
+    console.log(req.body, "body of init game");
     const validate = initGameSchema.safeParse(req.body);
     if (!validate.success) {
       return res
@@ -29,15 +29,17 @@ export const initGame = async (req: Request, res: Response) => {
       "jjfY1uWIdHXaLLXzbvlG9oDLdGc5I2z9",
       totalPlayers,
       emails
-    );  
+    );
 
+    await GameManager.initBoard(gameCreated.playerIds, gameCreated.id);
 
-
-    GameManager.initBoard(gameCreated.playerIds,gameCreated.id);
+    const wholeGame = await GameManager.getWholeGameState(gameCreated.id);
 
     return res
       .status(201)
-      .json(new ApiResponse(201,gameCreated, "Game Initialised Successfully", true));
+      .json(
+        new ApiResponse(201, wholeGame, "Game Initialised Successfully", true)
+      );
   } catch (error: any) {
     return res
       .status(500)
