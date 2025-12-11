@@ -6,6 +6,7 @@ import http from "http";
 import { auth } from "./lib/auth";
 import { RealTime } from "./services/ws/realTime";
 import { RedisInstance } from "./services/redis/redisClient";
+import { GameRoutes } from "./routes";
 
 export const app = express();
 export const server = http.createServer(app);
@@ -39,7 +40,8 @@ app.get("/api/me", async (req: Request, res: Response) => {
     headers: fromNodeHeaders(req.headers),
   });
   return res.json(session);
-});
+}); 
+app.use("/game",GameRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error(" Global error caught:", err);

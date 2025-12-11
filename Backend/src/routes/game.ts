@@ -6,10 +6,10 @@ import { initGame,gameValidation } from "../controller/game.controller";
 const router= express.Router();   
 
 
-router.use(Authenticate); 
+// router.use(Authenticate); 
 router.post("/initgame",initGame); 
-router.post("game/:gameId/user/:userId",gameValidation);  
-router.post("/exitgame",); 
+router.post("/:gameId/user/:userId",gameValidation);  
+// router.post("/exitgame",); 
 
 
 

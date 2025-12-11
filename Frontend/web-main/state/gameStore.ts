@@ -65,7 +65,7 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       B: "Blue",
       Y: "Yellow",
     };
-    for (const c of pawnColor) {
+    for (const c of pawnColor){
       [1, 2, 3, 4].forEach((v) => {
         const pId = `${c}P${v}`; // pawn id
         const color = mapColor[c];

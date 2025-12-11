@@ -5,20 +5,24 @@ import { ApiError } from "../utils/apiError";
 import { GameRepo } from "../repositry/game.repositry";
 import { ApiResponse } from "../utils/apiResponse";
 import { UserRepo } from "../repositry/user.repositry";
+import { GameManager } from "../services/game/gameManager";
 
 export const initGame = async (req: Request, res: Response) => {
   try {
     const validate = initGameSchema.safeParse(req.body);
     if (!validate.success) {
-      throw new ApiError(400, "Invalid Inputs", z.treeifyError(validate.error));
+      return res
+        .status(400)
+        .json(
+          new ApiError(400, "Invalid Inputs", z.treeifyError(validate.error))
+        );
     }
-
     const user = req.user;
     const onGoingGame = await UserRepo.userOnGoingGame(user?.email as string);
     if (onGoingGame) {
       throw new ApiError(403, "Already in a Game", "Can;t create game now");
     }
-    //no need to check for user exist or not alredy checked in the middleware;
+    // no need to check for user exist or not alredy checked in the middleware;
     const { totalPlayers, emails } = validate.data;
     const gameCreated = await GameRepo.createGame(
       user?.id!,
@@ -26,16 +30,15 @@ export const initGame = async (req: Request, res: Response) => {
       emails
     );
 
-    //todo call the gameManager and  init the gamebaord  and panw to the redis
+    GameManager.initBoard(["u1", "u2", "u3"], "234556");
 
-    return new ApiResponse(
-      201,
-      gameCreated,
-      "Game Initialised Successfully",
-      true
-    );
+    return res
+      .status(201)
+      .json(new ApiResponse(201, gameCreated, "Game Initialised Successfully", true));
   } catch (error: any) {
-    return new ApiError(500, "", error.message || "Internal Server Error");
+    return res
+      .status(500)
+      .json(new ApiError(500, error.message || "Internal Server Error"));
   }
 };
 

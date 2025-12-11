@@ -92,7 +92,8 @@ export type yellowSafePlace = ["Y1", "G8"];
 export const yellowPawn = ["YP1", "YP2", "YP3", "YP4"];
 export const bluePawn = ["BP1", "BP2", "BP3", "BP4"];
 export const greenPawn = ["GP1", "GP2", "GP3", "GP4"];
-export const redPawn = ["RP1", "RP2", "RP3", "RP4"];
+export const redPawn = ["RP1", "RP2", "RP3", "RP4"]; 
+export const dirstributePawn=[redPawn,yellowPawn,greenPawn,bluePawn]
 export const globaLBoard = [
   redBoardPath,
   greenBoardPath,
