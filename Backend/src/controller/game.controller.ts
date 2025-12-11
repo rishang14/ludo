@@ -8,7 +8,8 @@ import { UserRepo } from "../repositry/user.repositry";
 import { GameManager } from "../services/game/gameManager";
 
 export const initGame = async (req: Request, res: Response) => {
-  try {
+  try {  
+    console.log(req.body,"body of init game")
     const validate = initGameSchema.safeParse(req.body);
     if (!validate.success) {
       return res
@@ -17,24 +18,26 @@ export const initGame = async (req: Request, res: Response) => {
           new ApiError(400, "Invalid Inputs", z.treeifyError(validate.error))
         );
     }
-    const user = req.user;
-    const onGoingGame = await UserRepo.userOnGoingGame(user?.email as string);
-    if (onGoingGame) {
-      throw new ApiError(403, "Already in a Game", "Can;t create game now");
-    }
+    // const user = req.user;
+    // const onGoingGame = await UserRepo.userOnGoingGame(user?.email as string);
+    // if (onGoingGame) {
+    //   throw new ApiError(403, "Already in a Game", "Can;t create game now");
+    // }
     // no need to check for user exist or not alredy checked in the middleware;
     const { totalPlayers, emails } = validate.data;
     const gameCreated = await GameRepo.createGame(
-      user?.id!,
+      "jjfY1uWIdHXaLLXzbvlG9oDLdGc5I2z9",
       totalPlayers,
       emails
-    );
+    );  
 
-    GameManager.initBoard(["u1", "u2", "u3"], "234556");
+
+
+    GameManager.initBoard(gameCreated.playerIds,gameCreated.id);
 
     return res
       .status(201)
-      .json(new ApiResponse(201, gameCreated, "Game Initialised Successfully", true));
+      .json(new ApiResponse(201,gameCreated, "Game Initialised Successfully", true));
   } catch (error: any) {
     return res
       .status(500)

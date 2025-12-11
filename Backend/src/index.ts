@@ -22,6 +22,7 @@ app.use(
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
+app.use(express.json());
 try {
   await RedisInstance.initialize();
 } catch (error: any) {
@@ -29,7 +30,6 @@ try {
   process.exit(1); // Exit if DB or Redis fails
 }
 
-app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
   res.send("hello").status(200);

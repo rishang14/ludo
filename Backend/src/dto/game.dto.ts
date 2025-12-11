@@ -15,13 +15,13 @@ export const initGameSchema = z
     emails: z
       .array(z.email({ error: "Invalid email format" }))
       .nonempty("Emails array cannot be empty")
-      .max(4, { message: "Cannot provide more than 4 emails" })
+      .max(3, { message: "Cannot provide more than 3 emails" })
       .refine((arr) => new Set(arr).size === arr.length, {
         message: "Duplicate emails are not allowed",
       }),
   })
-  .refine((data) => data.emails.length === data.totalPlayers, {
-    message: "Emails count must match totalPlayers",
+  .refine((data) => data.emails.length === data.totalPlayers-1, {
+    message: "Emails should be only of invited player",
     path: ["emails"],
   });
 
