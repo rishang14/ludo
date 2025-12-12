@@ -13,9 +13,7 @@ import {
   pathToWin,
 } from "../../utils/constant";
 import { RedisInstance } from "../redis/redisClient";
-import { useId } from "react";
 import { calcMove } from "../../lib/helper";
-import { pid } from "process";
 
 export class GameManager {
   public static totalPlayer: number = 0;
