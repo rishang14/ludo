@@ -1,6 +1,5 @@
 "use client";
 import {  useGameStore } from "@/state/gameStore";
-import React from "react";
 import { Pawn } from "./Pawn";
 
 const WinZone = () => {

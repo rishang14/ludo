@@ -1,5 +1,9 @@
-import { json } from "express";
-import type { backBone, capturedReturnType, colors, pawn } from "../../dto/game.dto";
+import type {
+  backBone,
+  capturedReturnType,
+  colors,
+  pawn,
+} from "../../dto/game.dto";
 import {
   dirstributePawn,
   gameStarterkit,
@@ -11,6 +15,7 @@ import {
 import { RedisInstance } from "../redis/redisClient";
 import { useId } from "react";
 import { calcMove } from "../../lib/helper";
+import { pid } from "process";
 
 export class GameManager {
   public static totalPlayer: number = 0;
@@ -127,18 +132,21 @@ export class GameManager {
   private static NewBackBone(
     movablePawns: string[],
     diceVal: number,
-    userId: string
+    userId: string,
+    currentUserTurn: boolean,
+    canDiceMove: boolean,
+    canPawnMove: boolean
   ) {
     const canMove = movablePawns.length > 0;
     const turn = this.calcNextTurn(userId);
-    const color = this.userIdWithColor.get(turn!);
+    const color = this.userIdWithColor.get(currentUserTurn ? userId : turn!);
     const val: Record<backBone, any> = {
       diceVal,
-      canDiceRoll: !canMove,
-      canPawnMove: canMove,
+      canDiceRoll: canDiceMove,
+      canPawnMove: canPawnMove,
       currentTurn: color,
       winnerOrders: [],
-      currentUserTurn: turn,
+      currentUserTurn: currentUserTurn ? userId : turn,
       movablePawns,
     };
     return val;
@@ -158,55 +166,146 @@ export class GameManager {
       diceVal
     );
 
-    const newBackBone = this.NewBackBone(movablePawns, diceVal, userId);
+    const newBackBone = this.NewBackBone(
+      movablePawns,
+      diceVal,
+      userId,
+      movablePawns.length > 0,
+      movablePawns.length > 0 ? false : true,
+      movablePawns.length > 0
+    );
     for (const [key, value] of Object.entries(newBackBone)) {
       await RedisInstance.updateBoardState(gameId, key as backBone, value);
     }
     return newBackBone;
   }
 
-  private static async calcNewPos(diceVal: string, pawn: pawn) {}
-
-  private static async capturePawn(newPos: string, currPawn: pawn,gameId:string):Promise<capturedReturnType> {
-  const board:string[] = await RedisInstance.getOneBoardCell(gameId,newPos);  
-  
-  if(board.length===0){
-    return {captruedSuccess:false,capturedPawn:null}; 
-  } 
-    for(const p of board){
-      if(p.charAt(0)===currPawn.pId.charAt(0)){
-        return {captruedSuccess:false,capturedPawn:null}
-      }
-    }
-
+  private static async savePawnValue(
+    gameId: string,
+    isHome: boolean,
+    pId: string,
+    pathAcheived: boolean,
+    newPos?: string
+  ) {
+    const getPawn: pawn = await RedisInstance.getOnePawn(gameId, pId);
+    const newPawnVal: pawn = {
+      ...getPawn,
+      isHome,
+      position: isHome ? getPawn.pId : newPos ?? "",
+      isFinished: pathAcheived,
+    };
+    await RedisInstance.setPawn(gameId, newPawnVal);
   }
 
-  public static async movePawn(gameId: string, userId: String, pId: string) {
+  private static async updateBoardVal(
+    gameId: string,
+    captured: boolean,
+    pId: string,
+    cellId: string
+  ) {
+    const boardVal = await RedisInstance.getOneBoardCell(gameId, cellId);
+    let pawns: string[] = JSON.parse(boardVal);
+
+    if (captured) {
+      pawns = pawns.filter((i) => i != pId);
+    } else {
+      pawns.push(pId);
+    }
+    await RedisInstance.setBoard(gameId, cellId, pawns);
+  }
+
+  private static async capturePawn(
+    newPos: string,
+    currPawn: pawn,
+    gameId: string
+  ): Promise<capturedReturnType> {
+    const board: string[] = await RedisInstance.getOneBoardCell(gameId, newPos);
+
+    if (board.length === 0) {
+      return { captruedSuccess: false, capturedPawn: null };
+    }
+    for (const p of board) {
+      if (p.charAt(0) === currPawn.pId.charAt(0)) {
+        return { captruedSuccess: false, capturedPawn: null };
+      }
+      return { capturedPawn: p, captruedSuccess: true };
+    }
+    return { captruedSuccess: false, capturedPawn: null };
+  }
+
+  public static async movePawn(gameId: string, userId: string, pId: string) {
     const gameState = await RedisInstance.getGameStatus(gameId);
-    const movablePawns:string[] = JSON.parse(gameState.movablePawns!);
+    const movablePawns: string[] = JSON.parse(gameState.movablePawns!);
     const diceVal = JSON.parse(gameState.diceVal!);
     const color = JSON.parse(gameState.currentTurn!);
     const pawnPath: string[] = pathToWin[color as colors];
     if (JSON.parse(gameState.currentUserTurn!) !== userId) {
       throw new Error("Invalid User turn");
     }
-    const currPawn: pawn = await RedisInstance.getOnePawn(gameId, pId);  
-    if(!movablePawns.includes(pId)){
-      return ;
-    }   
-
-    const  {newPos,pathAcheived,isHome}=calcMove(pawnPath,currPawn,+diceVal);   
-     let captured:string | null 
-     let pawnWon:string|null 
-     let currPawnNewPos:string|null   
-      if(!globalSafePlace.has(newPos)){
-        const {capturedPawn, captruedSuccess}= await this.capturePawn(newPos,currPawn,gameId); 
-        if(captruedSuccess){
-          captured=capturedPawn
-        } 
-      }    
-      if(pathAcheived){
-         await RedisInstance.updatePawnVlalue(gameId,currPawn.pId,{...currPawn,isFinished:true,isHome})
+    const movablePawn: string[] = JSON.parse(gameState.movablePawn!);
+    if (!movablePawn.includes(pId)) {
+      return {
+        state: gameState,
+      };
+    }
+    const currPawn: pawn = await RedisInstance.getOnePawn(gameId, pId);
+    const { newPos, pathAcheived, isHome } = calcMove(
+      pawnPath,
+      currPawn,
+      +diceVal
+    );
+    let captured: string = "";
+    let nextTurn: boolean = false;
+    if (!globalSafePlace.has(newPos)) {
+      const { capturedPawn, captruedSuccess } = await this.capturePawn(
+        newPos,
+        currPawn,
+        gameId
+      );
+      if (captruedSuccess && capturedPawn) {
+        captured = capturedPawn ?? "";
+        //update the pawn new pos of the curpawn to newpos and also update the board
+        await this.savePawnValue(
+          gameId,
+          true,
+          capturedPawn,
+          false,
+          capturedPawn
+        );
+        await this.updateBoardVal(gameId, captruedSuccess, capturedPawn, pId); //reomved from the old cell
+        await this.updateBoardVal(gameId, false, capturedPawn, capturedPawn); // put it in the new cell
+        nextTurn = true;
       }
-   }
+    }
+    if (pathAcheived) {
+      await RedisInstance.updatePawnVlalue(gameId, currPawn.pId, {
+        ...currPawn,
+        isFinished: true,
+        isHome,
+      });
+      await this.updateBoardVal(gameId, true, pId, currPawn.pId); //reomved from the global board
+      nextTurn = true;
+    }
+
+    await this.savePawnValue(gameId, false, pId, false, newPos); // saved for the normal value  like normal nothing happend
+    await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
+    const newBackBone: Record<backBone, any> = this.NewBackBone(
+      [],
+      1,
+      userId,
+      nextTurn,
+      nextTurn,
+      !nextTurn
+    );
+    for (const [key, value] of Object.entries(newBackBone)) {
+      await RedisInstance.updateBoardState(gameId, key as backBone, value);
+    }
+    return {
+      pawnId: pId,
+      pawnNewPos: newPos,
+      pawnWon: pathAcheived,
+      capturedPawn: captured,
+      state: newBackBone,
+    };
+  }
 }
