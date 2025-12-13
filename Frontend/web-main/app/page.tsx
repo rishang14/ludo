@@ -1,99 +1,30 @@
-"use client";
-import { useEffect } from "react";
-import { Dice } from "@/components/Ludo/Dice";
-import { DrawPath } from "@/components/Ludo/DrawPath";
-import { StartBorad } from "@/components/Ludo/StartBorad";
-import {
-  blueBoardPath,
-  bluePawnHome,
-  drawBlueColor,
-  drawGreenColor,
-  drawRedColor,
-  drawYellowColor,
-  greenBoardPath,
-  greenPawnHome,
-  redBoardPath,
-  redPawnHome,
-  yellowBoardPath,
-  yellowPawnHome,
-  globaLBoard,
-} from "@/lib/constant";
-import { useGameStore } from "@/state/gameStore";
-import WinZone from "@/components/Ludo/WinZone";
+import PlaywithCompCard from "@/components/Home/playWithCompCard";
+import { PlaywithfriendCard } from "@/components/Home/playWithFriendCard";
+import { Dice1, Dice6 } from "lucide-react";
 
 export default function Page() {
-  const { initGameBoard, currTurn, diceVal, boardMap } = useGameStore(); 
-  useEffect(() => {
-    initGameBoard();
-  }, []);
-
   return (
-    <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
-      <div className=" space-y-2">
-        <h2 className="text-white text-center  text-4xl font-serif">
-          Ludo Board
-        </h2>
+    <div className=" min-h-screen w-full relative  overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-linear-to-br from-destructive/10 via-primary/10 to-accent/10" />
+        <div className="absolute inset-0 bg-linear-to-tr from-transparent via-secondary/5 to-transparent " />
       </div>
 
-      <div id="ludoBoard" className="rounded-sm">
-        <div className="red-board flex items-center justify-center rounded-sm bg-red-700/70">
-          <StartBorad bgColor="bg-red-500/80" pawnHome={redPawnHome} />
+      <div className=" z-10 mx-auto w-full max-w-[1040px] px-4 py-8 md:py-12">
+        <div className="mb-8 text-center md:mb-10">
+          <div className="mb-6 flex items-center justify-center gap-4">
+            <Dice1 className="h-10 w-10 md:h-12 md:w-12 text-destructive animate-bounce animate-duration-[2s]" />
+            <h1 className="text-gaming text-4xl font-bold tracking-wider md:text-6xl ">
+              <span className="text-white ">LUDO LEGENDS</span>
+            </h1>
+            <Dice6 className="h-10 w-10 md:h-12 md:w-12 text-accent animate-bounce animate-duration-[2s] animate-delay-300" />
+          </div>
         </div>
-        <div className="red-path horizontal-path bg-zinc-50">
-          <DrawPath
-            className=" -m-px border border-r-0   border-slate-950"
-            path={redBoardPath}
-            drawBgColorOnPath={drawRedColor}
-            color="#fb2c36cc"
-            pathname="redPath"
-          />
+
+        <div className="flex gap-2  flex-wrap justify-center items-center">
+          <PlaywithfriendCard />
+          <PlaywithCompCard />
         </div>
-        <div className="green-board flex items-center justify-center rounded-sm bg-green-500/80">
-          <StartBorad bgColor="bg-green-500" pawnHome={greenPawnHome} />
-        </div>
-        <div className="green-path vertical-path bg-zinc-50">
-          <DrawPath
-            path={greenBoardPath}
-            drawBgColorOnPath={drawGreenColor}
-            pathname="greenPath"
-            color="#00c950"
-            className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
-          />
-        </div>
-        <div className="win-zone rounded-sm bg-zinc-50  border-t-0 border-r-0 border-b-[0.25px] border-l-[.25px] border-slate-950">
-          <WinZone />
-        </div>
-        <div className="blue-board rounded-sm  flex items-center justify-center bg-blue-500/70">
-          <StartBorad bgColor="bg-blue-500" pawnHome={bluePawnHome} />
-        </div>
-        <div className="blue-path vertical-path bg-zinc-50">
-          <DrawPath
-            path={blueBoardPath}
-            pathname="bluepPath"
-            drawBgColorOnPath={drawBlueColor}
-            color="#2b7fff"
-            className="border-b-[.25px]  border-r-[.25px]   border-slate-950"
-          />
-        </div>
-        <div className="yellow-board flex items-center justify-center rounded-sm  bg-yellow-300/70">
-          <StartBorad bgColor="bg-yellow-400" pawnHome={yellowPawnHome} />
-        </div>
-        <div className="yellow-path horizontal-path bg-zinc-50">
-          <DrawPath
-            className=" -m-px border border-r-0 border-slate-950"
-            path={yellowBoardPath}
-            drawBgColorOnPath={drawYellowColor}
-            color="#fdc700"
-            pathname="yellow"
-          />
-        </div>
-      </div>
-      <div className="h-[150px] mx-auto flex p-2 justify-center flex-col gap-2 items-center w-[80%] bg-slate-800 rounded-md ">
-        <h1 className="text-white font-serif   ">Roll Dice: {diceVal} </h1>
-        <h2 className="text-white font-serif">
-          Current turn is of : {currTurn}
-        </h2>
-        <Dice />
       </div>
     </div>
   );
