@@ -12,8 +12,6 @@ import { useEffect } from "react"
 const Ludo=()=>{   
 const {currTurn,diceVal,canDiceRoll,canPawnMove,moveablePawn,initGameBoard}=useGameStore()  
 
-
-
 useEffect(()=>{
 initGameBoard();
 },[])
@@ -84,7 +82,7 @@ initGameBoard();
         <h2 className="text-white font-serif">
           Current turn is of : {currTurn}
         </h2>
-        <Dice />
+        <Dice/>
       </div>
     </div>
     )

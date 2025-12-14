@@ -1,6 +1,7 @@
+"use client"
 import { Bot, ComputerIcon, Swords, Zap } from "lucide-react";
 
-import { SharedCard } from "../ui/sharedCard";
+import { SharedCard } from "../Global/sharedCard";
 
 const PlaywithCompCard = () => {
   return (
@@ -14,7 +15,8 @@ const PlaywithCompCard = () => {
       buttonName="Play With Bot"
       contentIcon={<ComputerIcon className="h-5 w-5 " />}
       contentHeader="Practice Mode"
-      contentPara="Play with computer"
+      contentPara="Play with computer" 
+      onClick={()=>{}}
     />
   );
 };

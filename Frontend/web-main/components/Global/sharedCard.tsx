@@ -1,3 +1,4 @@
+"use client";
 import { Users } from "lucide-react";
 import {
   Card,
@@ -5,8 +6,8 @@ import {
   CardContent,
   CardDescription,
   CardTitle,
-} from "./card";
-import { Button } from "./button";
+} from "../ui/card";
+import { Button } from "../ui/button";
 
 type cardProp = {
   title: string;
@@ -16,7 +17,8 @@ type cardProp = {
   buttonName: string;
   contentHeader: string;
   contentPara: string; 
-  titleIcon:any
+  titleIcon:any, 
+  onClick:()=>void
 };
 
 export const SharedCard: React.FC<cardProp> = ({
@@ -27,7 +29,8 @@ export const SharedCard: React.FC<cardProp> = ({
   buttonIcon,
   buttonName,
   contentPara, 
-  titleIcon
+  titleIcon,
+  onClick
 }) => {
   return (
     <Card className="max-w-md border-2  border-primary     shadow-2xl transition-all  hover:shadow-primary/40 hover:border-primary/70">
@@ -63,7 +66,7 @@ export const SharedCard: React.FC<cardProp> = ({
         <Button
           size="default"
           className="w-full bg-linear-to-r cursor-pointer from-primary via-primary to-primary/80 hover:from-primary/90 hover:to-primary text-base h-12 shadow-xl shadow-primary/30 font-bold uppercase tracking-widest hover:shadow-2xl hover:shadow-primary/50 transition-all hover:scale-[1.02] border-2 border-primary/50"
-          // onClick={handleStartGame}
+          onClick={onClick}
         >
           {buttonIcon}
           {buttonName}
