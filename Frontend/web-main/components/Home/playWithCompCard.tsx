@@ -7,12 +7,12 @@ const PlaywithCompCard = () => {
     <SharedCard
       title="Solo Mode"
       desc="Challenge AI opponents and master your skills!"
-      titleIcon={<Bot className="h-8 w-8 text-accent-foreground" />}
+      titleIcon={<Bot className="h-8 w-8 text-primary-foreground" />}
       buttonIcon={
-        <Swords className="h-5 w-5 text-destructive opacity-0 group-hover:opacity-100 transition-opacity" />
+        <Swords className="h-5 w-5 mr-2" />
       }
       buttonName="Play With Bot"
-      contentIcon={<ComputerIcon className="h-5 w-5 text-primary" />}
+      contentIcon={<ComputerIcon className="h-5 w-5 " />}
       contentHeader="Practice Mode"
       contentPara="Play with computer"
     />

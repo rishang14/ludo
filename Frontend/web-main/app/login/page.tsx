@@ -1,11 +1,15 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { googleLogin } from "./action";
+import { LoginButton } from "@/components/Global/loginButton";
+import { getSession } from "@/lib/action/session.action";
+import { redirect } from "next/navigation";
 
-const page = () => {
+const page = async () => {
+  const session = await getSession();
+  if (session) {
+    return redirect("/");
+  }
   return (
     <div className=" flex items-center justify-center h-screen w-full">
-      <Button onClick={googleLogin}>Google</Button>
+      <LoginButton />
     </div>
   );
 };
