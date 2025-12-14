@@ -1,6 +1,6 @@
-import z, { email } from "zod";
+import z from "zod";
 import { initGameSchema, validId } from "../dto/game.dto";
-import { response, type Request, type Response } from "express";
+import {  type Request, type Response } from "express";
 import { ApiError } from "../utils/apiError";
 import { GameRepo } from "../repositry/game.repositry";
 import { ApiResponse } from "../utils/apiResponse";
@@ -59,31 +59,25 @@ export const gameValidation = async (req: Request, res: Response) => {
       throw new Error("Invalid userId or gameId");
     }
     const game = await GameRepo.getGame(gameId);
-    const user = req.user;
-    const playerExists = game.playerIds.includes(user?.id as string);
-    if (!playerExists) {
-      throw new ApiError(
+    const user = req.user; 
+    if(user?.id !== userId){
+       return res.json( new ApiError(
         403,
         "Unauthorized request",
         "You are not part of the ongoing game"
-      );
+      ))
     }
-    if (user?.id !== game.createdById) {
-      const userInfo = await UserRepo.getAndKnowUser(user?.email as string);
-      if (userInfo.onGoingGame) {
-        return new ApiError(
-          409,
-          "You are already a part of other game",
-          "One user can Play one Game at a time"
-        );
-      }
-      const updated = await UserRepo.updateUserData(userInfo.id, {
-        onGoingGame: game.id,
-      });
+    const playerExists = game.playerIds.includes(userId as string);
+    if (!playerExists) {
+    return res.json( new ApiError(
+        403,
+        "Unauthorized request",
+        "You are not part of the ongoing game"
+      ))
     }
-    return new ApiResponse(200, game, `Welcome ${user?.name}`, true);
+    return res.json(new ApiResponse(200, game, `Welcome ${user?.name}`, true))
   } catch (error: any) {
-    return new ApiError(500, "Error", error.message ?? "Internal Server Error");
+    return res.json(new ApiError(500, "Error", error.message ?? "Internal Server Error"));
   }
 };
 
@@ -115,7 +109,9 @@ export const exitGame = async (req: Request, res: Response) => {
     if (!validId.safeParse(gameId)) {
       throw new Error("Invalid gameId");
     } 
-    const deletegame = await GameManager.exitOrDeleteGame(gameId);
+    const deletegame = await GameManager.exitOrDeleteGame(gameId);  
+
+  //todo send via socket of the gameId connected user that user exited the game game-canceled and clear the whole game board
     return res.json(
       new ApiResponse(200, deletegame, "Game removed successfully")
     );
