@@ -1,7 +1,7 @@
 import { Logoutbutton } from "@/components/Global/logoutbutton";
 import PlaywithCompCard from "@/components/Home/playWithCompCard";
 import { PlaywithfriendCard } from "@/components/Home/playWithFriendCard";
-import { getSession } from "@/lib/action/session.action";
+import { getOngoingGame, getSession } from "@/lib/action/server.action";
 
 import { Dice1, Dice6 } from "lucide-react";
 import { redirect } from "next/navigation";
@@ -10,9 +10,12 @@ export default async function Page() {
   const session = await getSession();
   if (!session) {
     return redirect("/login");
-  }
+  }  
 
-  return (
+ const ongoinggame=await getOngoingGame(); 
+
+
+   return (
     <div className=" min-h-screen w-full relative  overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-linear-to-br from-destructive/10 via-primary/10 to-accent/10" />

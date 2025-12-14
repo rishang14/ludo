@@ -1,5 +1,5 @@
 import { LoginButton } from "@/components/Global/loginButton";
-import { getSession } from "@/lib/action/session.action";
+import { getSession } from "@/lib/action/server.action";
 import { redirect } from "next/navigation";
 
 const page = async () => {

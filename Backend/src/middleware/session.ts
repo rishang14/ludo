@@ -29,7 +29,8 @@ export const Authenticate = async (
     req.session=session.session  
     req.user=session.user 
     next();
-  } catch (error) {
+  } catch (error) { 
+    console.log("Failde in middleware");
    return res.json({ error: "Internal Server Error" }).status(500);
   }
 };

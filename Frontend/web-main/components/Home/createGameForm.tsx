@@ -1,5 +1,4 @@
 "use client"
-
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Input } from "../ui/input"
@@ -7,26 +6,40 @@ import { Label } from "../ui/label"
 import { Button } from "../ui/button"
 import { useForm } from "react-hook-form"
 import type React from "react"
+import axios from "axios"
 
 type dialogProp = {
   isDialogOpen: boolean
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOpen }) => {
+export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOpen }) => {  
+  console.log(process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT,"value of endpoint")
   const {
     register,
     handleSubmit,
     watch,
     setValue,
-    formState: { errors },
+    formState: {errors,isSubmitting },
   } = useForm()
-
   const totalPlayers = watch("totalPlayers")
 
-  const onSubmit = async (data: any) => {
-    console.log("Form data:", data)
-    // Handle form submission here
+  const onSubmit = async (data: any) => { 
+    let emails:string[]=[];
+    try {
+      for(const [key,value] of Object.entries(data)){
+         if(key==="totalPlayers") continue; 
+         emails.push(value as string);
+      }   
+      const createGame= await axios.post(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/creategame`,{
+        totalPlayers:+data.totalPlayers, 
+        emails:emails
+      },{withCredentials:true})    
+      
+      console.log(createGame,"gamecreated")
+    } catch (error:any) {
+      console.log(error,"error");
+    }
   }
 
   return (
@@ -44,16 +57,16 @@ export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOp
           <div className="space-y-2">
             <Label htmlFor="totalPlayers">Total Number of Players</Label>
             <Select onValueChange={(value) => setValue("totalPlayers", value)} defaultValue="">
-              <SelectTrigger id="totalPlayers" className={errors.totalPlayers ? "border-destructive" : ""}>
+              <SelectTrigger disabled={isSubmitting} id="totalPlayers" className={errors.totalPlayers ? "border-destructive" : ""}>
                 <SelectValue placeholder="Select number of players" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent >
                 <SelectItem value="2">2 Players</SelectItem>
                 <SelectItem value="3">3 Players</SelectItem>
                 <SelectItem value="4">4 Players</SelectItem>
               </SelectContent>
             </Select>
-            <input
+            <Input
               type="hidden"
               {...register("totalPlayers", {
                 required: "Please select number of players",
@@ -69,7 +82,8 @@ export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOp
                   <Label htmlFor={`playerEmail${index + 1}`}>Player {index + 1} Email</Label>
                   <Input
                     id={`playerEmail${index + 1}`}
-                    type="email"
+                    type="email" 
+                    disabled={isSubmitting}
                     placeholder={`player${index + 1}@example.com`}
                     {...register(`playerEmail${index + 1}`, {
                       required: `Player ${index + 1} email is required`,
@@ -93,11 +107,12 @@ export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOp
               type="button"
               variant="outline"
               className="flex-1 bg-transparent"
-              onClick={() => setDialogOpen(false)}
+              onClick={() => setDialogOpen(false)} 
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1 bg-primary">
+            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-primary">
               Send Invite
             </Button>
           </div>

@@ -1,4 +1,5 @@
 "use server"  
+import axios from "axios";
 import { headers } from "next/headers";
 
 export const getSession= async()=>{
@@ -16,4 +17,18 @@ export const getSession= async()=>{
  } catch (error) {
     return null;
  }
+}   
+
+
+
+export const getOngoingGame= async()=>{
+  try {
+   const value= await fetch(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/getongoinggame`,{
+      headers:await headers()
+   }) ; 
+    const data = await value.json(); 
+    return data;
+  } catch (error) {
+    console.log("error in onginog game",error);
+  }
 }

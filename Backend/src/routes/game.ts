@@ -1,13 +1,14 @@
 import express from "express"
 import { Authenticate } from "../middleware/session";
-import { initGame,gameValidation } from "../controller/game.controller";
+import { initGame,gameValidation ,getOngoingGame} from "../controller/game.controller";
 
 
 const router= express.Router();   
 
 
-// router.use(Authenticate); 
-router.post("/initgame",initGame); 
+router.use(Authenticate); 
+router.post("/creategame",initGame);  
+router.get('/getongoinggame',getOngoingGame);
 router.post("/:gameId/user/:userId",gameValidation);  
 // router.post("/exitgame",); 
 

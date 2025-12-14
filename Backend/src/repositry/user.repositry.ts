@@ -3,9 +3,9 @@ import prisma from "../prisma";
 
 export class UserRepo {
   public static async getAndKnowUser(email: string): Promise<User> {
-    const user = await prisma.user.findFirstOrThrow({ where: { email } });
+    const user = await prisma.user.findFirst({ where: { email } });
     if (!user) {
-      throw new Error("User Not Found");
+      throw new Error(`User Not Found with the email :${email}`);
     }
     return user;
   }
@@ -42,8 +42,8 @@ export class UserRepo {
   public static async userOnGoingGame(email: string){
     const user = await this.getAndKnowUser(email);
     if (user.onGoingGame) {
-      throw new Error(`${user.name} is Currently In Game`);
+     return {success:true, data:user.onGoingGame};
     } 
-    return false;
+    return {success:false,data:null};;
   }
 }

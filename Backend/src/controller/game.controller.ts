@@ -1,6 +1,6 @@
-import z from "zod";
+import z, { email } from "zod";
 import { initGameSchema, validId } from "../dto/game.dto";
-import type { Request, Response } from "express";
+import { response, type Request, type Response } from "express";
 import { ApiError } from "../utils/apiError";
 import { GameRepo } from "../repositry/game.repositry";
 import { ApiResponse } from "../utils/apiResponse";
@@ -18,21 +18,21 @@ export const initGame = async (req: Request, res: Response) => {
           new ApiError(400, "Invalid Inputs", z.treeifyError(validate.error))
         );
     }
-    // const user = req.user;
-    // const onGoingGame = await UserRepo.userOnGoingGame(user?.email as string);
-    // if (onGoingGame) {
-    //   throw new ApiError(403, "Already in a Game", "Can;t create game now");
-    // }
-    // no need to check for user exist or not alredy checked in the middleware;
+    const user = req.user;
+    const onGoingGame = await UserRepo.userOnGoingGame(user?.email as string);
+    if (onGoingGame.success) {
+      throw new ApiError(403, "You are already in a game can't create again");
+    }
+    // // no need to check for user exist or not alredy checked in the middleware;
     const { totalPlayers, emails } = validate.data;
     const gameCreated = await GameRepo.createGame(
-      "jjfY1uWIdHXaLLXzbvlG9oDLdGc5I2z9",
+      user?.id as string,
       totalPlayers,
       emails
     );
-
-    await GameManager.initBoard(gameCreated.playerIds, gameCreated.id);
-
+    if (gameCreated) {
+      await GameManager.initBoard(gameCreated.playerIds, gameCreated.id);
+    }
 
     return res
       .status(201)
@@ -40,9 +40,12 @@ export const initGame = async (req: Request, res: Response) => {
         new ApiResponse(201, gameCreated, "Game Initialised Successfully", true)
       );
   } catch (error: any) {
+    console.log("Error found here in initgame", error.message);
     return res
       .status(500)
-      .json(new ApiError(500, error.message || "Internal Server Error"));
+      .json(
+        new ApiError(500, "Error", error.message ?? "Internal Server Error")
+      );
   }
 };
 
@@ -80,10 +83,24 @@ export const gameValidation = async (req: Request, res: Response) => {
     }
     return new ApiResponse(200, game, `Welcome ${user?.name}`, true);
   } catch (error: any) {
-    return new ApiError(
-      500,
-      "Something went wrong",
-      error.message || "Internal Server Error"
+    return new ApiError(500, "Error", error.message ?? "Internal Server Error");
+  }
+};
+
+export const getOngoingGame = async (req: Request, res: Response) => {
+  try {
+    const user = req.user;
+
+    const { success, data } = await UserRepo.userOnGoingGame(
+      user?.email as string
+    );
+    if (success) {
+      return res.json(new ApiResponse(403, data, "You are already in a game"));
+    }
+    return res.json(new ApiResponse(200, null, "No onGoing game found"));
+  } catch (error: any) {
+    return res.json(
+      new ApiError(500, error.message ?? "Internal server Error")
     );
   }
 };

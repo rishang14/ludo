@@ -7,12 +7,12 @@ export class GameRepo {
     ownerId: string,
     totalPlayer: number,
     email: string[]
-  ): Promise<Game> {
+  ): Promise<Game > {
     const playerIds: string[] = [];
     for (const e of email) {
-      let user = await UserRepo.getAndKnowUser(e);
+      let user = await UserRepo.getAndKnowUser(e); 
       if (user.onGoingGame) {
-        throw new Error(`${user.email} is Currently in Game`);
+        throw new Error(`${user.email} is Currently in some game`);
       }
       playerIds.push(user.id);
     }
@@ -23,12 +23,13 @@ export class GameRepo {
         createdById: ownerId,
         playerIds: playerIds,
       },
-    });
+    });  
     if (!createdGame) {
       throw new Error("Game is not created try again");
     }
+    await UserRepo.updateUserData(ownerId,{onGoingGame:createdGame.id}) 
 
-    return createdGame;
+    return createdGame; 
   }   
 
   public static async getGame(gameId:string):Promise<Game>{
