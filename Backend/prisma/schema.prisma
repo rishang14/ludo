@@ -25,7 +25,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
-  Game          Game[]
+  game          Game[]
 
   @@unique([email])
   @@map("user")
@@ -86,7 +86,7 @@ enum GameStatus {
   SCHEDULED
 }
 
-model Game{
+model Game {
   id          String   @id @default(cuid())
   totalPlayer        Int
   createdAt   DateTime @default(now())
@@ -94,6 +94,9 @@ model Game{
   status      GameStatus @default(SCHEDULED)
   playerIds   String[]
   createdById String
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdBy   User     @relation(fields: [createdById], references: [id]) 
+
+
+  @@map("game")
 }
   

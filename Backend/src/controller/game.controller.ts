@@ -104,3 +104,25 @@ export const getOngoingGame = async (req: Request, res: Response) => {
     );
   }
 };
+
+export const exitGame = async (req: Request, res: Response) => {
+  try {
+    const { gameId } = req.params; 
+    console.log(gameId);
+    if (!gameId) {
+      throw new Error("GameId is missing");
+    }
+    if (!validId.safeParse(gameId)) {
+      throw new Error("Invalid gameId");
+    } 
+    const deletegame = await GameManager.exitOrDeleteGame(gameId);
+    return res.json(
+      new ApiResponse(200, deletegame, "Game removed successfully")
+    );
+  } catch (error: any) { 
+    console.log("Error",error)
+    return res.json(
+      new ApiError(500, error.message ?? "Internal server error")
+    );
+  }
+};

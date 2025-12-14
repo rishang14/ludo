@@ -11,7 +11,7 @@ export class RedisInstance {
     return `${gameId}:board`;
   }
 
-  private static boardState(gameId: string) {
+  private static boardStateKey(gameId: string) {
     return `${gameId}:state`;
   }
 
@@ -152,7 +152,7 @@ export class RedisInstance {
     await this.setBoard(gameId, newCellId, newCellVal);
   }
 
-  public static async updateBoardState(
+  public static async updateBoardStateKey(
     gameId: string,
     details: backBone,
     val: any
@@ -160,7 +160,7 @@ export class RedisInstance {
     if (!this.client) {
       throw new Error("Redis is not connected");
     }
-    const key = this.boardState(gameId);
+    const key = this.boardStateKey(gameId);
     const state = await this.client.hSet(key, details, JSON.stringify(val));
   
   }
@@ -169,25 +169,38 @@ export class RedisInstance {
     if (!this.client) {
       throw new Error("Redis is not connected");
     }
-    const key = this.boardState(gameId);
-    const boardState = await this.client.hGetAll(key);
-    if (!boardState) {
+    const key = this.boardStateKey(gameId);
+    const boardStateKey = await this.client.hGetAll(key);
+    if (!boardStateKey) {
       throw new Error("Invalid board state key ");
     }
-    return boardState;
+    return boardStateKey;
   }
 
-  public static async getBoardState(gameId: string, details: string) {
+  public static async getBoardStateKey(gameId: string, details: string) {
     if (!this.client) {
       throw new Error("Redis is not connected");
     }
 
-    const key = this.boardState(gameId);
-    const boardState = await this.client.hGet(key, details);
-    if (!boardState) {
+    const key = this.boardStateKey(gameId);
+    const boardStateKey = await this.client.hGet(key, details);
+    if (!boardStateKey) {
       throw new Error("Invalid board state key");
     }
 
-    return JSON.parse(boardState);
-  }
+    return JSON.parse(boardStateKey);
+  }  
+
+ public static async cleanInMemory(gameId:string){
+    const cellkey=this.boardKey(gameId); 
+    const pawnKey=this.pawnKey(gameId); 
+    const state=this.boardStateKey(gameId);   
+
+    if(!this.client){
+      throw new Error("Redis is not connected")  
+    }    
+     const deleted= await this.client.unlink([cellkey,pawnKey,state]); 
+     console.log("we are deleted from the redis instance",deleted);
+    return deleted;
+ }
 }

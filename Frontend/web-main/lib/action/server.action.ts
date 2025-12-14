@@ -1,6 +1,7 @@
 "use server"  
 import axios from "axios";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export const getSession= async()=>{
  try {
@@ -30,5 +31,17 @@ export const getOngoingGame= async()=>{
     return data;
   } catch (error) {
     console.log("error in onginog game",error);
+  }
+}  
+
+export  const exitOrCancelGame=async(gameId:string)=>{
+  try {
+    const res =await fetch(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/exitgame/${gameId}`,{ 
+      method:"DELETE",
+      headers:await headers()
+    })  
+    const value= await res.json(); 
+  } catch (error) {  
+    console.log(error);
   }
 }

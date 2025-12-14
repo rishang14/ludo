@@ -14,6 +14,8 @@ import {
 } from "../../utils/constant";
 import { RedisInstance } from "../redis/redisClient";
 import { calcMove } from "../../lib/helper";
+import { GameRepo } from "../../repositry/game.repositry";
+import { UserRepo } from "../../repositry/user.repositry";
 
 export class GameManager {
   public static totalPlayer: number = 0;
@@ -57,15 +59,19 @@ export class GameManager {
     //gameStarterkit
     for (const p of gameStarterkit) {
       if (p.key === "currentUserTurn") {
-        await RedisInstance.updateBoardState(gameId, p.key, totlPlayerIds[0]);
+        await RedisInstance.updateBoardStateKey(
+          gameId,
+          p.key,
+          totlPlayerIds[0]
+        );
       } else if (p.key === "currentTurn") {
-        await RedisInstance.updateBoardState(
+        await RedisInstance.updateBoardStateKey(
           gameId,
           p.key,
           this.userIdWithColor.get(totlPlayerIds[0]!)
         );
       } else {
-        await RedisInstance.updateBoardState(gameId, p.key, p.value);
+        await RedisInstance.updateBoardStateKey(gameId, p.key, p.value);
       }
     }
   }
@@ -173,7 +179,7 @@ export class GameManager {
       movablePawns.length > 0
     );
     for (const [key, value] of Object.entries(newBackBone)) {
-      await RedisInstance.updateBoardState(gameId, key as backBone, value);
+      await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
     return newBackBone;
   }
@@ -296,7 +302,7 @@ export class GameManager {
       !nextTurn
     );
     for (const [key, value] of Object.entries(newBackBone)) {
-      await RedisInstance.updateBoardState(gameId, key as backBone, value);
+      await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
     return {
       pawnId: pId,
@@ -305,5 +311,22 @@ export class GameManager {
       capturedPawn: captured,
       state: newBackBone,
     };
+  }
+
+  public static async exitOrDeleteGame(gameId: string) {
+    try {
+      const getGame = await GameRepo.getGame(gameId);
+      for (const i of getGame.playerIds) {
+        await UserRepo.updateUserData(i, { onGoingGame: null });
+      }
+      const gameData = await GameRepo.deleteGame(gameId);
+      const data = await RedisInstance.cleanInMemory(gameId);
+      console.log("game data deleted successfully", gameData);
+      console.log("Redis is also cleaned", data);
+      return true;
+    } catch (error) {
+      console.log("Error in game manager", error);
+      throw new Error("Error while deleting the gameData and redis instance");
+    }
   }
 }
