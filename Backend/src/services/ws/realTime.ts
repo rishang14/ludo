@@ -35,7 +35,6 @@ export class RealTime {
   }
 
   private async handlers(socket: any, msg: any) {
-    console.log("message any", msg);
 
     switch (msg.type) {
       case "join_User":

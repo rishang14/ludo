@@ -1,5 +1,6 @@
 import { Socket } from "dgram";
 import { create } from "zustand";
+import { useGameStore } from "./gameStore";
 
 type JoinedUser = {
   gameId: string;
@@ -38,10 +39,9 @@ export const useSocket = create<SocketType>()((set, get) => ({
       ws.close();
     };
 
-    ws.onmessage = (e) => { 
-      console.log(e)
-      const payload = JSON.parse(e.data); 
-      console.log("in the onmessage",payload)
+    ws.onmessage = (e) => {
+      console.log(e);
+      const payload = JSON.parse(e.data);
       get().handleMessage(payload);
     };
   },
@@ -50,8 +50,8 @@ export const useSocket = create<SocketType>()((set, get) => ({
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(JSON.stringify({ type, payload }));
   },
-  disconnectSocket: () => {   
-    console.log("i am disconnected")
+  disconnectSocket: () => {
+    console.log("i am disconnected");
     const ws = get().socket;
     if (ws) {
       set({ socket: null, isConnected: false });
@@ -59,6 +59,17 @@ export const useSocket = create<SocketType>()((set, get) => ({
     }
   },
   handleMessage: (payload: any) => {
-    console.log("payload in the handleMessage", payload);
+    switch (payload.type) {
+      case "game_status":
+      const {pawnMap,gameBackbone,globaLBoardMap}= payload.data; 
+      useGameStore.getState().initGameBoard(pawnMap,globaLBoardMap,gameBackbone); 
+        // console.log(pawnMap);
+        // console.log(JSON.parse(gameBackbone)); 
+        // console.log(JSON.parse(globaLBoardMap));
+        break;
+
+      default:
+        break;
+    }
   },
 }));

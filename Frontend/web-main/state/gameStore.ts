@@ -1,14 +1,14 @@
 import { globaLBoard, globalSafePlace } from "@/lib/constant";
 import { create } from "zustand";
 import { calcMove, getPathOfPawn } from "./gameHleper";
-
+import { any } from "better-auth";
 
 type colors = "Red" | "Blue" | "Green" | "Yellow";
 export type pawn = {
   pId: string;
   position: string;
-  isHome: boolean; 
-  userId:string
+  isHome: boolean;
+  userId: string;
   isFinished: boolean;
   color: colors;
 };
@@ -16,13 +16,13 @@ export type pawn = {
 interface gameBoard {
   pawnMap: Map<string, pawn>;
   boardMap: Map<string, Set<string>>;
-  currTurn: string;
+  currentTurn: string; 
+  currentUserTurn :string
   canDiceRoll: boolean;
-  canPawnMove: boolean;
-  nextTurn: () => void;
-  movement: string[];
-  moveablePawn: Set<string>;
-  initGameBoard: () => void;
+  canPawnMove: boolean; 
+  winnerOrders :string[],
+  movablePawn: Set<string>;
+  initGameBoard: (pawnMap: any, globalBoard: any, gameState: any) => void;
   getMovablePawn: (diceVal: number) => string[];
   diceVal: number;
   safePlace: Set<string>;
@@ -34,54 +34,37 @@ interface gameBoard {
 export const useGameStore = create<gameBoard>()((set, get) => ({
   pawnMap: new Map(),
   boardMap: new Map(),
-  safePlace: new Set(),
-  canDiceRoll: true,
-  canPawnMove: false,
+  safePlace: new Set(globalSafePlace),
+  canDiceRoll : true,
+  canPawnMove: false, 
+  winnerOrders :[],
   diceVal: 1,
-  movement: ["Red", "Green", "Yellow", "Blue"],
-  currTurn: "Red",
-  moveablePawn: new Set(),
+  currentUserTurn :"",
+  currentTurn : "Red",
+  movablePawn: new Set(),
 
-  initGameBoard: () => {
-    const pawnMap = new Map<string, pawn>();
+  initGameBoard: (pMap, gMap, gState) => {
+    const pawnMap = new Map<string, pawn>(); 
     const boardMap = new Map<string, Set<string>>();
-    const safePlace = new Set<string>();
-    globaLBoard.flatMap((cell) => {
-      //board is ready with all the cell with empty set
-      for (let val of cell) {
-        boardMap.set(val, new Set());
+    for (const [key, value] of Object.entries(pMap)) {
+      const val: pawn = JSON.parse(value as any);
+      pawnMap.set(key, val);
+    }
+    for (const [key, value] of Object.entries(gMap)) {
+      boardMap.set(key, new Set());
+      const val: string[] = JSON.parse(value as any);
+      for (const c of val) {
+        boardMap.get(key)?.add(c);
       }
-    });
-    // Currently this start with assuming 4 player in the match make it customizable
+    }    
+    
 
-    for (const p of globalSafePlace) {
-      safePlace.add(p);
-    }
 
-    let pawnColor = ["R", "G", "B", "Y"];
-    let mapColor: Record<string, string> = {
-      R: "Red",
-      G: "Green",
-      B: "Blue",
-      Y: "Yellow",
-    };
-    for (const c of pawnColor){
-      [1, 2, 3, 4].forEach((v) => {
-        const pId = `${c}P${v}`; // pawn id
-        const color = mapColor[c];
-        const pawn = {
-          pId,
-          position: pId,
-          isHome: true,
-          isFinished: false, 
-          userId:"",
-          color: color as colors,
-        }; // pawn value
-        pawnMap.set(pId, pawn); // pawn is placed in pawn map for all board
-        boardMap.get(pId)?.add(pId); //pawn is placed inside the main map
-      });
-    }
-    set({ pawnMap, boardMap, safePlace });
+for (const [key, value] of Object.entries(gState)) {
+  set({[key as keyof gameBoard]:JSON.parse(value as any)})
+}
+    
+    set({ pawnMap, boardMap});
   },
 
   capturePawn: (newPos, currentpawn): boolean => {
@@ -116,10 +99,10 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
 
   movePawn: (pawnId: string) => {
     set({ canDiceRoll: true });
-    const currnetTurnPawns = get().moveablePawn;
+    const currnetTurnPawns = get().movablePawn;
     const diceVal = get().diceVal;
     const allpawn = new Map(get().pawnMap);
-    const currentTurn = get().currTurn;
+    const currentTurn = get().currentTurn;
     const globaLBoard = new Map(get().boardMap);
     const getPawnPath = getPathOfPawn({ color: currentTurn as any });
     if (!currnetTurnPawns.has(pawnId)) {
@@ -166,17 +149,11 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     return;
   },
 
-  nextTurn: () => {
-    const currTurn = get().currTurn;
-    const currIdx = get().movement.indexOf(currTurn);
-    const totalSize = get().movement.length;
-    const nextTurn = get().movement[currIdx + 1 < totalSize ? currIdx + 1 : 0];
-    set({ currTurn: nextTurn });
-  },
+
 
   getMovablePawn: (diceVal: number) => {
     const currentTurnPawnPos: string[] = [];
-    const turn = get().currTurn;
+    const turn = get().currentTurn;
     const pawnPath = getPathOfPawn({ color: turn as any });
     for (let i = 1; i <= 4; i++) {
       const pId = `${turn.charAt(0)}P${i}`;
@@ -206,7 +183,7 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     let currentTurnPawnPos: string[] = get().getMovablePawn(diceVal);
 
     set({ canPawnMove: true });
-    const movable = get().moveablePawn;
+    const movable = get().movablePawn;
     movable.clear();
 
     if (currentTurnPawnPos.length === 0) {
@@ -217,13 +194,13 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     currentTurnPawnPos.forEach((v) => movable.add(v));
 
     if (currentTurnPawnPos.length === 1) {
-      set({ diceVal, moveablePawn: movable, canDiceRoll: false });
+      set({ diceVal, movablePawn: movable, canDiceRoll: false });
       get().movePawn(currentTurnPawnPos[0] as string);
       return;
     }
 
     // this is pushing into movable item
-    set({ diceVal, moveablePawn: movable, canDiceRoll: false });
+    set({ diceVal, movablePawn: movable, canDiceRoll: false });
     return;
   },
 }));

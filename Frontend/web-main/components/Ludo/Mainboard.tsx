@@ -1,5 +1,5 @@
 "use client";
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { Dice } from "@/components/Ludo/Dice";
 import { DrawPath } from "@/components/Ludo/DrawPath";
 import { StartBorad } from "@/components/Ludo/StartBorad";
@@ -28,39 +28,25 @@ type LudoProp = {
 };
 
 const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
-  const {
-    currTurn,
-    diceVal,
-    canDiceRoll,
-    canPawnMove,
-    moveablePawn,
-    initGameBoard,
-  } = useGameStore();
-  const {
-    connectToSocket,
-    disconnectSocket,
-    sendToServer,
-    socket,
-    isConnected,
-  } = useSocket();
+  const { currentTurn, diceVal, currentUserTurn } = useGameStore();
+  const { connectToSocket, disconnectSocket, sendToServer, isConnected } =
+    useSocket();
 
   useEffect(() => {
-    connectToSocket();  
+    connectToSocket();
 
     return disconnectSocket();
   }, []);
- 
-  useEffect(() => { 
-    if(!gameId || !userId) return;
-    if (isConnected) {  
-      sendToServer("join_User", { gameId, userId });
-    }
-  }, [isConnected,gameId,userId]);
 
   useEffect(() => {
-    initGameBoard();
-  }, []);
-  return (
+    if (!gameId || !userId) return;
+    if (isConnected) {
+      sendToServer("join_User", { gameId, userId });
+    }
+  }, [isConnected, gameId, userId]);
+    console.log(currentUserTurn,"turn") 
+    console.log("userId", userId);
+    return (
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
         <h2 className="text-white text-center  text-4xl font-serif">
@@ -122,11 +108,11 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
         </div>
       </div>
       <div className="h-[150px] mx-auto flex p-2 justify-center flex-col gap-2 items-center w-[80%] bg-slate-800 rounded-md ">
-        <h1 className="text-white font-serif   ">Roll Dice: {diceVal} </h1>
+        <h1 className="text-white font-serif   ">Roll Dice: {diceVal}</h1>
         <h2 className="text-white font-serif">
-          Current turn is of : {currTurn}
+          {currentUserTurn === userId ? "Your" : "Opponent"} turn
         </h2>
-        <Dice />
+        {currentUserTurn === userId && <Dice />}
       </div>
     </div>
   );
