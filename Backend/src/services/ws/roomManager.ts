@@ -3,11 +3,11 @@ export class RoomManager {
   private userWithSocket: Map<string, Set<any>> = new Map();
 
   public joinRoom(gameId: string,userId:string, socket: any,) { 
-    if(!gameId || userId)return;
+    if(!gameId || !userId)return;
     if (!this.gamwWithSocket.has(gameId)) {
       this.gamwWithSocket.set(gameId, new Set());
     }
-    if (!this.userWithSocket.has(gameId)) {
+    if (!this.userWithSocket.has(userId)) {
       this.userWithSocket.set(userId, new Set());
     }  
     console.log("User id joined",userId); 
@@ -49,8 +49,6 @@ export class RoomManager {
     client.forEach((socket) => {
       try {
         const data = JSON.stringify(payload); 
-        console.log("Sending it to the client",data); 
-        console.log("Send to ",socket);
         socket.send(data);
       } catch (error) {
         console.log("Error while sending the data", error);

@@ -16,11 +16,12 @@ export type pawn = {
 interface gameBoard {
   pawnMap: Map<string, pawn>;
   boardMap: Map<string, Set<string>>;
-  currentTurn: string; 
-  currentUserTurn :string
+  currentTurn: string;
+  currentUserTurn: string;
   canDiceRoll: boolean;
-  canPawnMove: boolean; 
-  winnerOrders :string[],
+  canPawnMove: boolean;
+  winnerOrders: string[];
+  updateBackbone: (gState: any) => void;
   movablePawn: Set<string>;
   initGameBoard: (pawnMap: any, globalBoard: any, gameState: any) => void;
   getMovablePawn: (diceVal: number) => string[];
@@ -35,16 +36,16 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
   pawnMap: new Map(),
   boardMap: new Map(),
   safePlace: new Set(globalSafePlace),
-  canDiceRoll : true,
-  canPawnMove: false, 
-  winnerOrders :[],
+  canDiceRoll: true,
+  canPawnMove: false,
+  winnerOrders: [],
   diceVal: 1,
-  currentUserTurn :"",
-  currentTurn : "Red",
+  currentUserTurn: "",
+  currentTurn: "Red",
   movablePawn: new Set(),
 
   initGameBoard: (pMap, gMap, gState) => {
-    const pawnMap = new Map<string, pawn>(); 
+    const pawnMap = new Map<string, pawn>();
     const boardMap = new Map<string, Set<string>>();
     for (const [key, value] of Object.entries(pMap)) {
       const val: pawn = JSON.parse(value as any);
@@ -56,15 +57,17 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
       for (const c of val) {
         boardMap.get(key)?.add(c);
       }
-    }    
-    
+    }
+    get().updateBackbone(gState);
+    set({ pawnMap, boardMap });
+  },
 
-
-for (const [key, value] of Object.entries(gState)) {
-  set({[key as keyof gameBoard]:JSON.parse(value as any)})
-}
-    
-    set({ pawnMap, boardMap});
+  updateBackbone: (gState: any) => { 
+    console.log(gState,"value of whole data")
+    for (const [key, value] of Object.entries(gState)) { 
+      console.log(key,"value", JSON.parse(value as any))
+      set({ [key as keyof gameBoard]: JSON.parse(value as any) });
+    }
   },
 
   capturePawn: (newPos, currentpawn): boolean => {
@@ -148,8 +151,6 @@ for (const [key, value] of Object.entries(gState)) {
 
     return;
   },
-
-
 
   getMovablePawn: (diceVal: number) => {
     const currentTurnPawnPos: string[] = [];

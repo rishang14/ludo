@@ -35,25 +35,39 @@ export class RealTime {
   }
 
   private async handlers(socket: any, msg: any) {
-
     switch (msg.type) {
       case "join_User":
-       
-        this.room.joinRoom(`game:${msg.payload.gameId}`, `user:${msg.payloaduserId}`, socket);
-        const wholeBoard = await GameManager.getWholeGameState(msg.payload.gameId); 
+        this.room.joinRoom(
+          `game:${msg.payload.gameId}`,
+          `user:${msg.payload.userId}`,
+          socket
+        );
+        const wholeBoard = await GameManager.getWholeGameState(
+          msg.payload.gameId
+        );
         socket.send(
           JSON.stringify({
             type: "game_status",
             data: wholeBoard,
           })
         );
-        this.room.broadcastInRoom(
-          `game:${msg.payload.gameId}`,
-          JSON.stringify({
-            type: "user_Joined",
-            id: msg.payload.userId,
-          })
+        this.room.broadcastInRoom(`game:${msg.payload.gameId}`, {
+          type: "user_Joined",
+          id: msg.payload.userId,
+        });
+        break;
+      case "roll_Dice":
+        console.log("message value in the rolldice", msg);
+        const backBone = await GameManager.rollDice(
+          msg.payload.gameId,
+          msg.payload.userId
         );
+        console.log(backBone, "backbone");
+        this.room.broadcastInRoom(`game:${msg.payload.gameId}`, {
+          type: "dice_Rolled",
+          data: backBone,
+        });
+        break;
     }
   }
 }

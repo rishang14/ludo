@@ -1,4 +1,3 @@
-import { Socket } from "dgram";
 import { create } from "zustand";
 import { useGameStore } from "./gameStore";
 
@@ -41,7 +40,7 @@ export const useSocket = create<SocketType>()((set, get) => ({
 
     ws.onmessage = (e) => {
       console.log(e);
-      const payload = JSON.parse(e.data);
+      const payload = JSON.parse(e.data); 
       get().handleMessage(payload);
     };
   },
@@ -61,13 +60,15 @@ export const useSocket = create<SocketType>()((set, get) => ({
   handleMessage: (payload: any) => {
     switch (payload.type) {
       case "game_status":
-      const {pawnMap,gameBackbone,globaLBoardMap}= payload.data; 
-      useGameStore.getState().initGameBoard(pawnMap,globaLBoardMap,gameBackbone); 
-        // console.log(pawnMap);
-        // console.log(JSON.parse(gameBackbone)); 
-        // console.log(JSON.parse(globaLBoardMap));
+        const { pawnMap, gameBackbone, globaLBoardMap } = payload.data;
+        useGameStore
+          .getState()
+          .initGameBoard(pawnMap, globaLBoardMap, gameBackbone);
         break;
-
+      case "dice_Rolled":  
+      console.log(payload,"payload"); 
+     useGameStore.getState().updateBackbone(payload.data.backBone);
+      break;
       default:
         break;
     }

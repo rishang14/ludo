@@ -20,7 +20,7 @@ import { UserRepo } from "../../repositry/user.repositry";
 export class GameManager {
   public static totalPlayer: number = 0;
   private static turns: Set<string> = new Set();
-  private static userIdWithColor: Map<string, string> = new Map();
+  private static userIdWithColor: Map<string, string> = new Map(); 
 
   public static async initBoard(totlPlayerIds: string[], gameId: string) {
     //game pawn
@@ -30,7 +30,9 @@ export class GameManager {
     this.totalPlayer = totlPlayerIds.length;
     for (let i = 0; i < totlPlayerIds.length; i++) {
       for (const p of dirstributePawn[i]!) {
-        if (!this.userIdWithColor.get(totlPlayerIds[i]!)) {
+        if (totlPlayerIds[i]  &&   !this.userIdWithColor.get(totlPlayerIds[i]!)){ 
+          console.log("came for id",totlPlayerIds[i]); 
+          console.log("came for color", mapColor[p.charAt(0)]);
           this.userIdWithColor.set(
             totlPlayerIds[i]!,
             mapColor[p.charAt(0)] as colors
@@ -58,21 +60,24 @@ export class GameManager {
 
     //gameStarterkit
     for (const p of gameStarterkit) {
-      if (p.key === "currentUserTurn") {
+      if (p.key as Partial<backBone> === "currentUserTurn") {
         await RedisInstance.updateBoardStateKey(
           gameId,
           p.key,
           totlPlayerIds[0]
-        );
-      } else if (p.key === "currentTurn") {
+        ); 
+        return;
+      }
+       if (p.key as Partial<backBone> === "currentTurn") {
         await RedisInstance.updateBoardStateKey(
           gameId,
           p.key,
           this.userIdWithColor.get(totlPlayerIds[0]!)
-        );
-      } else {
+        ); 
+        return;
+      }        
         await RedisInstance.updateBoardStateKey(gameId, p.key, p.value);
-      }
+
     }
   }
 
@@ -127,9 +132,11 @@ export class GameManager {
 
   private static calcNextTurn(userId: string) {
     const turns = [...this.turns];
-    const idx = turns.indexOf(userId);
+    const idx = turns.indexOf(userId); 
+    console.log(idx,"idx of new turns") 
+    console.log("turns array",turns);
     const totalLength = turns.length;
-    const newIdx = idx + 1 > totalLength ? 0 : idx + 1;
+    const newIdx = idx + 1 >= totalLength ? 0 : idx + 1; 
     return turns[newIdx];
   }
 
@@ -142,8 +149,11 @@ export class GameManager {
     canPawnMove: boolean
   ) {
     const canMove = movablePawns.length > 0;
-    const turn = this.calcNextTurn(userId);
-    const color = this.userIdWithColor.get(currentUserTurn ? userId : turn!);
+    const turn = this.calcNextTurn(userId); 
+    console.log(turn,"turn for the user"); 
+    console.log(currentUserTurn,"current user turn boolean")
+    const color = this.userIdWithColor.get(currentUserTurn ? userId : turn!); 
+    console.log(color,"currentTurn color")
     const val: Record<backBone, any> = {
       diceVal,
       canDiceRoll: canDiceMove,
@@ -157,12 +167,15 @@ export class GameManager {
   }
 
   public static async rollDice(gameId: string, userId: string) {
-    const gameState = await RedisInstance.getGameStatus(gameId);
+    const gameState = await RedisInstance.getGameStatus(gameId); 
+    console.log(gameState,"gameState")
     if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
-    const diceVal = this.generateDiceVal();
-    const p = this.userIdWithColor.get(userId);
+    const diceVal = this.generateDiceVal(); 
+    console.log(this.userIdWithColor.forEach(t => console.log(t,"for user")))
+    const p = this.userIdWithColor.get(userId); 
+    console.log(p, "color for userId", userId);
     if (!p) throw new Error("UserId is Wrong");
     const movablePawns = await this.calcMovablePawn(
       gameId,
@@ -178,10 +191,14 @@ export class GameManager {
       movablePawns.length > 0 ? false : true,
       movablePawns.length > 0
     );
-    for (const [key, value] of Object.entries(newBackBone)) {
+    console.log("whole body of the redis client for storing the newbackbone",newBackBone) 
+    for (const [key, value] of Object.entries(newBackBone)) { 
+      // console.log(key ,"value fo the backbone",value);
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
-    return newBackBone;
+    return {
+      backbone:newBackBone
+    };  
   }
 
   private static async savePawnValue(
@@ -301,7 +318,9 @@ export class GameManager {
       nextTurn,
       !nextTurn
     );
-    for (const [key, value] of Object.entries(newBackBone)) {
+    for (const [key, value] of Object.entries(newBackBone)) { 
+      console.log("whole body of the redis client for storing the newbackbone",newBackBone) 
+      console.log(key ,"value fo the backbone",value);
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
     return {

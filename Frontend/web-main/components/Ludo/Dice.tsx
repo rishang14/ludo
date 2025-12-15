@@ -9,6 +9,7 @@ import {
   Dice6Icon,
 } from "lucide-react";
 import { useGameStore } from "@/state/gameStore";
+import { useSocket } from "@/state/socketClient";
 
 const diceMap: Record<number, any> = {
   1: <Dice1Icon className="w-full" size={"80px"} />,
@@ -19,10 +20,22 @@ const diceMap: Record<number, any> = {
   6: <Dice6Icon className="w-full" size={"80px"} />,
 };
 
+type DiceProp={
+  userId:string, 
+  gameId:string
+}
 
-export const Dice = () => {  
+export const Dice:React.FC<DiceProp> = ({userId,gameId}) => {  
 
-  const {diceVal,rollDice,canDiceRoll}=useGameStore()
+  const {diceVal,currentUserTurn, canDiceRoll}=useGameStore();  
+  console.log(canDiceRoll,"dice roll"); 
+  console.log(currentUserTurn,"currTrurn");
+  const {sendToServer}=useSocket() 
+  const rollDice=()=>{
+    if(currentUserTurn !== userId) return;   
+    console.log("clicked and send to the server");
+    sendToServer("roll_Dice",{gameId,userId})
+  }
   return (
     <div 
       onClick={(e) => { 

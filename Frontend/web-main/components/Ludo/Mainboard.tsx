@@ -44,8 +44,6 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
       sendToServer("join_User", { gameId, userId });
     }
   }, [isConnected, gameId, userId]);
-    console.log(currentUserTurn,"turn") 
-    console.log("userId", userId);
     return (
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
@@ -112,7 +110,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
         <h2 className="text-white font-serif">
           {currentUserTurn === userId ? "Your" : "Opponent"} turn
         </h2>
-        {currentUserTurn === userId && <Dice />}
+        {currentUserTurn === userId && <Dice  gameId={gameId} userId={userId}/>}
       </div>
     </div>
   );

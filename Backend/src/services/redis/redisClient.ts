@@ -160,9 +160,16 @@ export class RedisInstance {
     if (!this.client) {
       throw new Error("Redis is not connected");
     }
-    const key = this.boardStateKey(gameId);
+   try {
+     const key = this.boardStateKey(gameId);
     const state = await this.client.hSet(key, details, JSON.stringify(val));
-  
+    // if (!state) {
+    //   throw new Error("Invalid   backbone key "); 
+    // } 
+    return state;
+   } catch (error) {
+    console.log(error,"error while updating the gamstate")
+   }
   }
 
   public static async getGameStatus(gameId: string) {

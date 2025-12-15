@@ -351,7 +351,7 @@ export const gameStarterkit:kit[]= [
   }, 
   {
     key:"canDiceRoll",
-    value:false, 
+    value:true, 
   }, {
     key:"canPawnMove",
     value:false, 
