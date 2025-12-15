@@ -53,10 +53,18 @@ export const gameValidation = async (req: Request, res: Response) => {
   try {
     const { gameId, userId } = req.params;
     if (!gameId || !userId) {
-      throw new Error("One Field is missing GameId or UserId");
+         return res.json( new ApiError(
+        403,
+        "Missing Field",
+        "Missing  gameId or userId"
+      ))
     }
     if (!(validId.safeParse(gameId) || validId.safeParse(userId))) {
-      throw new Error("Invalid userId or gameId");
+         return res.json( new ApiError(
+        403,
+        "Invalid request",
+        "Invalid gameId or userId"
+      ))
     }
     const game = await GameRepo.getGame(gameId);
     const user = req.user; 

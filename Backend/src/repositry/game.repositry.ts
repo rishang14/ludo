@@ -35,7 +35,6 @@ export class GameRepo {
   }
 
   public static async getGame(gameId: string): Promise<Game> { 
-    console.log("gameId",gameId)
     const game = await prisma.game.findFirstOrThrow({
       where: {
         id: gameId,

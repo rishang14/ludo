@@ -76,11 +76,11 @@ export class GameManager {
     }
   }
 
-  public static async getWholeGameState(gameId: string) {
+  public static async getWholeGameState(gameId: string) {  
+    if(!gameId)return;
     const pawns = await RedisInstance.getAllPawn(gameId);
-    const board = await RedisInstance.getFullBoard(gameId);
+    const board = await RedisInstance.getFullBoard(gameId); 
     const gameStatus = await RedisInstance.getGameStatus(gameId);
-
     return {
       pawnMap: pawns,
       globaLBoardMap: board,

@@ -1,7 +1,6 @@
 "use server"  
-import axios from "axios";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+
 
 export const getSession= async()=>{
  try {

@@ -21,6 +21,7 @@ export class RealTime {
       });
 
       socket.on("close", () => {
+        console.log("Close happend");
         this.room.clearConnection(socket);
       });
 
@@ -37,18 +38,23 @@ export class RealTime {
     console.log("message any", msg);
 
     switch (msg.type) {
-      case "joinUser":
-        this.room.joinRoom(`game:${msg.gameId}`, `user:${msg.userId}`, socket);
-        const wholeBoard = await GameManager.getWholeGameState(msg.gameId);
+      case "join_User":
+       
+        this.room.joinRoom(`game:${msg.payload.gameId}`, `user:${msg.payloaduserId}`, socket);
+        const wholeBoard = await GameManager.getWholeGameState(msg.payload.gameId); 
         socket.send(
           JSON.stringify({
-          type: "game_status",
-          data: wholeBoard,
-        })); 
-        this.room.broadcastInRoom(`game:${msg.gameId}`,JSON.stringify({
-          type:"user_Joined", 
-          id:msg.userId
-        }))
+            type: "game_status",
+            data: wholeBoard,
+          })
+        );
+        this.room.broadcastInRoom(
+          `game:${msg.payload.gameId}`,
+          JSON.stringify({
+            type: "user_Joined",
+            id: msg.payload.userId,
+          })
+        );
     }
   }
 }

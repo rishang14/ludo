@@ -1,22 +1,67 @@
-"use client"
+"use client";
+export const dynamic = 'force-dynamic';
+import { Dice } from "@/components/Ludo/Dice";
+import { DrawPath } from "@/components/Ludo/DrawPath";
+import { StartBorad } from "@/components/Ludo/StartBorad";
+import WinZone from "@/components/Ludo/WinZone";
+import {
+  blueBoardPath,
+  bluePawnHome,
+  drawBlueColor,
+  drawGreenColor,
+  drawRedColor,
+  drawYellowColor,
+  greenBoardPath,
+  greenPawnHome,
+  redBoardPath,
+  redPawnHome,
+  yellowBoardPath,
+  yellowPawnHome,
+} from "@/lib/constant";
+import { useGameStore } from "@/state/gameStore";
+import { useSocket } from "@/state/socketClient";
+import React, { useEffect, useId } from "react";
 
-import { Dice } from "@/components/Ludo/Dice"
-import { DrawPath } from "@/components/Ludo/DrawPath"
-import { StartBorad } from "@/components/Ludo/StartBorad"
-import WinZone from "@/components/Ludo/WinZone"
-import { blueBoardPath, bluePawnHome, drawBlueColor, drawGreenColor, drawRedColor, drawYellowColor, greenBoardPath, greenPawnHome, redBoardPath, redPawnHome, yellowBoardPath, yellowPawnHome } from "@/lib/constant"
-import { useGameStore } from "@/state/gameStore"
-import { useEffect } from "react"
+type LudoProp = {
+  gameId: string;
+  userId: string;
+};
 
+const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
+  const {
+    currTurn,
+    diceVal,
+    canDiceRoll,
+    canPawnMove,
+    moveablePawn,
+    initGameBoard,
+  } = useGameStore();
+  const {
+    connectToSocket,
+    disconnectSocket,
+    sendToServer,
+    socket,
+    isConnected,
+  } = useSocket();
 
-const Ludo=()=>{   
-const {currTurn,diceVal,canDiceRoll,canPawnMove,moveablePawn,initGameBoard}=useGameStore()  
+  useEffect(() => {
+    connectToSocket();  
 
-useEffect(()=>{
-initGameBoard();
-},[])
-    return (
-           <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
+    return disconnectSocket();
+  }, []);
+ 
+  useEffect(() => { 
+    if(!gameId || !userId) return;
+    if (isConnected) {  
+      sendToServer("join_User", { gameId, userId });
+    }
+  }, [isConnected,gameId,userId]);
+
+  useEffect(() => {
+    initGameBoard();
+  }, []);
+  return (
+    <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
         <h2 className="text-white text-center  text-4xl font-serif">
           Ludo Board
@@ -70,8 +115,7 @@ initGameBoard();
           <DrawPath
             className=" -m-px border border-r-0 border-slate-950"
             path={yellowBoardPath}
-            drawBgColorOnPath={drawYellowColor
-            }
+            drawBgColorOnPath={drawYellowColor}
             color="#fdc700"
             pathname="yellow"
           />
@@ -82,10 +126,10 @@ initGameBoard();
         <h2 className="text-white font-serif">
           Current turn is of : {currTurn}
         </h2>
-        <Dice/>
+        <Dice />
       </div>
     </div>
-    )
-}
+  );
+};
 
-export default Ludo
+export default Ludo;

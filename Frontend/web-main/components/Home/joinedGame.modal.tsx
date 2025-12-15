@@ -24,7 +24,7 @@ export const ActiveGameDetectModal: React.FC<GameModalProps> = ({
   isOpen,
   gameId,
   userId,
-}) => {   
+}) => {     
   const exitgame=async ()=>{
 try {
     const res=  await  exitOrCancelGame(gameId); 
@@ -32,7 +32,8 @@ try {
 } catch (error) {
   console.log(resizeBy,"res");
 }
-  } 
+  }   
+
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent
@@ -56,7 +57,7 @@ try {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col sm:gap-2 mt-4">
-          <Link href={`game/${gameId}/user/${userId}`}>
+          <Link href={`game/${gameId}/user/${userId}`} prefetch={false}>
             <Button size="lg" className="w-full">
               Join the Game
             </Button>

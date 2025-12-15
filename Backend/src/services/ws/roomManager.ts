@@ -2,15 +2,18 @@ export class RoomManager {
   private gamwWithSocket: Map<string, Set<any>> = new Map();
   private userWithSocket: Map<string, Set<any>> = new Map();
 
-  public joinRoom(gameId: string,userId:string, socket: any,) {
+  public joinRoom(gameId: string,userId:string, socket: any,) { 
+    if(!gameId || userId)return;
     if (!this.gamwWithSocket.has(gameId)) {
       this.gamwWithSocket.set(gameId, new Set());
     }
     if (!this.userWithSocket.has(gameId)) {
-      this.userWithSocket.set(gameId, new Set());
-    }
+      this.userWithSocket.set(userId, new Set());
+    }  
+    console.log("User id joined",userId); 
+    console.log("gameId joined",gameId)
     this.gamwWithSocket.get(gameId)?.add(socket);
-    this.userWithSocket.get(gameId)?.add(socket);
+    this.userWithSocket.get(userId)?.add(socket);
   }
 
   //   public getTotalUser(gameId:string){
@@ -45,7 +48,9 @@ export class RoomManager {
 
     client.forEach((socket) => {
       try {
-        const data = JSON.stringify(payload);
+        const data = JSON.stringify(payload); 
+        console.log("Sending it to the client",data); 
+        console.log("Send to ",socket);
         socket.send(data);
       } catch (error) {
         console.log("Error while sending the data", error);
