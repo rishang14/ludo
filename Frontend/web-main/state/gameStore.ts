@@ -1,7 +1,7 @@
-import { globaLBoard, globalSafePlace } from "@/lib/constant";
+import { globalSafePlace } from "@/lib/constant";
 import { create } from "zustand";
 import { calcMove, getPathOfPawn } from "./gameHleper";
-import { any } from "better-auth";
+import { pid } from "process";
 
 type colors = "Red" | "Blue" | "Green" | "Yellow";
 export type pawn = {
@@ -22,6 +22,20 @@ interface gameBoard {
   canPawnMove: boolean;
   winnerOrders: string[];
   updateBackbone: (gState: any) => void;
+  updateBoard: (
+    pId: string,
+    captured: boolean,
+    capturedPawn: string,
+    newPos: string,
+    isFinished: boolean
+  ) => void;
+  updatePawnState: (
+    pId: string,
+    captured: boolean,
+    isFinished: boolean,
+    newpos?: string
+  ) => void;
+  updateBoardState: (pId: string, oldPos: string, newPos: string) => void;
   movablePawn: Set<string>;
   initGameBoard: (pawnMap: any, globalBoard: any, gameState: any) => void;
   getMovablePawn: (diceVal: number) => string[];
@@ -58,16 +72,75 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
         boardMap.get(key)?.add(c);
       }
     }
-    get().updateBackbone(gState);
+
+    for (const [key, value] of Object.entries(gState)) {
+      if (key === "movablePawns") {
+        set({ movablePawn: new Set(JSON.parse(value as any)) });
+        continue;
+      }
+      set({ [key as keyof gameBoard]: JSON.parse(value as any) });
+    }
+
     set({ pawnMap, boardMap });
   },
 
-  updateBackbone: (gState: any) => { 
-    console.log(gState,"value of whole data")
-    for (const [key, value] of Object.entries(gState)) { 
-      console.log(key,"value", JSON.parse(value as any))
-      set({ [key as keyof gameBoard]: JSON.parse(value as any) });
+  updateBoard: (pId, captured, capturendPawn, newPos, isFinished) => {
+    const pawn = get().pawnMap.get(pId);
+    if (!pawn) return;
+    console.log(pawn, "pawn");
+    if (captured) {
+      const capPawn = get().pawnMap.get(capturendPawn);
+      if (!capPawn) return;
+      get().updatePawnState(capturendPawn, true, false);
+      get().updatePawnState(pId, false, false, newPos);
+      get().updateBoardState(pId, pawn.position, newPos);
+      get().updateBoardState(capturendPawn, capPawn.position, capturendPawn);
+      return;
     }
+    if (isFinished) {
+      get().updatePawnState(pId, false, true, "");
+      get().updateBoardState(pId, pawn.position, "");
+      return;
+    }
+
+    get().updatePawnState(pId, false, false, newPos);
+    get().updateBoardState(pId, pawn.position, newPos);
+  },
+
+  updateBackbone: (gState: any) => {
+    for (const [key, value] of Object.entries(gState)) {
+      if (key === "movablePawns") {
+        set({ movablePawn: new Set(value as any) });
+        continue;
+      }
+      set({ [key as keyof gameBoard]: value as any });
+    }
+  },
+
+  updateBoardState: (pId, oldPos, newPos) => {
+    const board = new Map(get().boardMap);
+
+    board.get(oldPos)?.delete(pId);
+    board.get(newPos)?.add(pId);
+
+    set({ boardMap: board });
+  },
+
+  updatePawnState: (pId, captured, isFinished, newPos) => {
+    const pawns= new Map(get().pawnMap);  
+    const pawn= pawns.get(pId);  
+  if(!pawn) return;
+    pawns.set(pId, {  
+      ...pawn,
+      position: captured
+        ? pId
+        : isFinished
+        ? ""
+        : newPos ?? pawn.position,
+      isFinished: isFinished ? true : pawn.isFinished,
+    })
+
+    set({pawnMap: pawns})
   },
 
   capturePawn: (newPos, currentpawn): boolean => {
@@ -75,14 +148,12 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     const allpawn = new Map(get().pawnMap);
     const pawnsAtNewPos = boardMap.get(newPos);
     if (!pawnsAtNewPos || pawnsAtNewPos.size === 0) {
-      console.log("No pawn are available");
       return false;
     }
-    console.log("cell value whith pawn set:", pawnsAtNewPos);
+
     for (let p of pawnsAtNewPos) {
       if (p.charAt(0) === currentpawn.pId.charAt(0)) return false;
       const capturedpawn = allpawn.get(p);
-      console.log("pawn to be kill of pawn id", p);
       // console.log(" that pawn  ",capturedpawn);
       if (!capturedpawn) return false;
       allpawn.set(capturedpawn.pId, {

@@ -16,6 +16,7 @@ import { RedisInstance } from "../redis/redisClient";
 import { calcMove } from "../../lib/helper";
 import { GameRepo } from "../../repositry/game.repositry";
 import { UserRepo } from "../../repositry/user.repositry";
+import { useId } from "react";
 
 export class GameManager {
   public static totalPlayer: number = 0;
@@ -31,8 +32,6 @@ export class GameManager {
     for (let i = 0; i < totlPlayerIds.length; i++) {
       for (const p of dirstributePawn[i]!) {
         if (totlPlayerIds[i]  &&   !this.userIdWithColor.get(totlPlayerIds[i]!)){ 
-          console.log("came for id",totlPlayerIds[i]); 
-          console.log("came for color", mapColor[p.charAt(0)]);
           this.userIdWithColor.set(
             totlPlayerIds[i]!,
             mapColor[p.charAt(0)] as colors
@@ -133,8 +132,6 @@ export class GameManager {
   private static calcNextTurn(userId: string) {
     const turns = [...this.turns];
     const idx = turns.indexOf(userId); 
-    console.log(idx,"idx of new turns") 
-    console.log("turns array",turns);
     const totalLength = turns.length;
     const newIdx = idx + 1 >= totalLength ? 0 : idx + 1; 
     return turns[newIdx];
@@ -148,12 +145,10 @@ export class GameManager {
     canDiceMove: boolean,
     canPawnMove: boolean
   ) {
-    const canMove = movablePawns.length > 0;
-    const turn = this.calcNextTurn(userId); 
-    console.log(turn,"turn for the user"); 
-    console.log(currentUserTurn,"current user turn boolean")
+    const turn = this.calcNextTurn(userId);   
+
+
     const color = this.userIdWithColor.get(currentUserTurn ? userId : turn!); 
-    console.log(color,"currentTurn color")
     const val: Record<backBone, any> = {
       diceVal,
       canDiceRoll: canDiceMove,
@@ -161,21 +156,20 @@ export class GameManager {
       currentTurn: color,
       winnerOrders: [],
       currentUserTurn: currentUserTurn ? userId : turn,
-      movablePawns,
-    };
+      movablePawns, 
+    };  
     return val;
   }
 
   public static async rollDice(gameId: string, userId: string) {
     const gameState = await RedisInstance.getGameStatus(gameId); 
-    console.log(gameState,"gameState")
+ 
     if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
     const diceVal = this.generateDiceVal(); 
-    console.log(this.userIdWithColor.forEach(t => console.log(t,"for user")))
+    // console.log(this.userIdWithColor.forEach(t => console.log(t,"for user")))
     const p = this.userIdWithColor.get(userId); 
-    console.log(p, "color for userId", userId);
     if (!p) throw new Error("UserId is Wrong");
     const movablePawns = await this.calcMovablePawn(
       gameId,
@@ -191,7 +185,6 @@ export class GameManager {
       movablePawns.length > 0 ? false : true,
       movablePawns.length > 0
     );
-    console.log("whole body of the redis client for storing the newbackbone",newBackBone) 
     for (const [key, value] of Object.entries(newBackBone)) { 
       // console.log(key ,"value fo the backbone",value);
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
@@ -223,10 +216,10 @@ export class GameManager {
     captured: boolean,
     pId: string,
     cellId: string
-  ) {
-    const boardVal = await RedisInstance.getOneBoardCell(gameId, cellId);
-    let pawns: string[] = JSON.parse(boardVal);
+  ) { 
 
+    const boardVal = await RedisInstance.getOneBoardCell(gameId, cellId); 
+    let pawns: string[] = boardVal;
     if (captured) {
       pawns = pawns.filter((i) => i != pId);
     } else {
@@ -255,16 +248,15 @@ export class GameManager {
   }
 
   public static async movePawn(gameId: string, userId: string, pId: string) {
-    const gameState = await RedisInstance.getGameStatus(gameId);
-    const movablePawns: string[] = JSON.parse(gameState.movablePawns!);
+    const gameState = await RedisInstance.getGameStatus(gameId); 
+    const movablePawns: string[] = JSON.parse(gameState.movablePawns!); 
     const diceVal = JSON.parse(gameState.diceVal!);
     const color = JSON.parse(gameState.currentTurn!);
     const pawnPath: string[] = pathToWin[color as colors];
     if (JSON.parse(gameState.currentUserTurn!) !== userId) {
       throw new Error("Invalid User turn");
     }
-    const movablePawn: string[] = JSON.parse(gameState.movablePawn!);
-    if (!movablePawn.includes(pId)) {
+    if (!movablePawns.includes(pId)){
       return {
         state: gameState,
       };
@@ -306,7 +298,10 @@ export class GameManager {
       });
       await this.updateBoardVal(gameId, true, pId, currPawn.pId); //reomved from the global board
       nextTurn = true;
-    }
+    }  
+    if(+diceVal === 6){
+      nextTurn= true;
+    } 
 
     await this.savePawnValue(gameId, false, pId, false, newPos); // saved for the normal value  like normal nothing happend
     await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
@@ -315,12 +310,10 @@ export class GameManager {
       1,
       userId,
       nextTurn,
-      nextTurn,
-      !nextTurn
-    );
+      true,
+      false
+    );   
     for (const [key, value] of Object.entries(newBackBone)) { 
-      console.log("whole body of the redis client for storing the newbackbone",newBackBone) 
-      console.log(key ,"value fo the backbone",value);
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
     return {
@@ -328,8 +321,8 @@ export class GameManager {
       pawnNewPos: newPos,
       pawnWon: pathAcheived,
       capturedPawn: captured,
-      state: newBackBone,
-    };
+      backbone: newBackBone,
+    }; 
   }
 
   public static async exitOrDeleteGame(gameId: string) {
@@ -340,8 +333,6 @@ export class GameManager {
       }
       const gameData = await GameRepo.deleteGame(gameId);
       const data = await RedisInstance.cleanInMemory(gameId);
-      console.log("game data deleted successfully", gameData);
-      console.log("Redis is also cleaned", data);
       return true;
     } catch (error) {
       console.log("Error in game manager", error);

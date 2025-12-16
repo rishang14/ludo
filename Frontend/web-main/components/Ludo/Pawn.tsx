@@ -1,50 +1,57 @@
 "use client";
 
 import { useGameStore } from "@/state/gameStore";
-import { useEffect, useRef } from "react";
+import { useSocket } from "@/state/socketClient";
+import { usePathname } from "next/navigation";
+import {  useRef } from "react";
 
 interface PawnSVGProps {
   color: string;
   size?: number;
-  id: string;
-  isActive: boolean; 
+  id: string; 
   isFinished:boolean
 }
 
 export const Pawn = ({
   color = "#EF4444",
   size = 30,
-  id,
-  isActive, 
+  id,  
   isFinished
 }: PawnSVGProps) => {
   const pawnRef = useRef<HTMLElement | null>(null);
-  const { movePawn, currTurn, canPawnMove } = useGameStore();
+  const { currentUserTurn, canPawnMove,movablePawn } = useGameStore();  
+  const pathname= usePathname();   
+  const userId=pathname.split('/')[4]; 
+  const gameId=pathname.split('/')[2]; 
+  const {sendToServer}=useSocket()
   const pawncolor: Record<string, any> = {
     Blue: "#93c5fd",
     Red: "#fb7185",
     Green: "#a7f3d0",
     Yellow: "#fef08a",
-  };
-
+  }; 
   return (
     <span
       id={id}
       ref={pawnRef}
-      className={`  ${!isFinished && "absolute"}  ${isActive ? "z-50" : "z-10"}`}
+      className={`  ${!isFinished && "absolute"}  ${movablePawn.has(id) ? "z-50" : "z-10"}`}
       onClick={(e) => {
-        e.stopPropagation();
-        if (canPawnMove) {
-          movePawn(id);
+        e.stopPropagation();   
+        if(!userId || !gameId) return;
+        if (canPawnMove  && movablePawn.has(id)) {  
+          if(currentUserTurn ===userId){
+            sendToServer("pawn_Clicked",{gameId,userId,pId:id})
+           console.log(" i am send")
+          }
         }
       }}
     >
       <svg
-        width={isActive ?size+5 :size}
+        width={movablePawn.has(id) ?size+5 :size}
         id={id}
-        height={isActive ? size+5 :size}
+        height={movablePawn.has(id) ? size+5 :size}
         viewBox="0 0 100 100"
-        className={`transition-transform  cursor-pointer  ${isActive ? "scale-110  z-50 " : "hover:scale-105"}`}
+        className={`transition-transform  cursor-pointer  ${movablePawn.has(id) ? "scale-110  z-50 " : "hover:scale-105"}`}
       >
         <ellipse cx="50" cy="85" rx="35" ry="8" fill="rgba(0,0,0,0.1)" />
 

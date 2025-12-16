@@ -43,7 +43,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
     if (isConnected) {
       sendToServer("join_User", { gameId, userId });
     }
-  }, [isConnected, gameId, userId]);
+  }, [isConnected, gameId, userId]); 
+  console.log(userId,"userId in main board")
     return (
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
@@ -60,7 +61,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
           <DrawPath
             className=" -m-px border border-r-0   border-slate-950"
             path={redBoardPath}
-            drawBgColorOnPath={drawRedColor}
+            drawBgColorOnPath={drawRedColor} 
+            userId={userId}
             color="#fb2c36cc"
             pathname="redPath"
           />
@@ -72,7 +74,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
           <DrawPath
             path={greenBoardPath}
             drawBgColorOnPath={drawGreenColor}
-            pathname="greenPath"
+            pathname="greenPath" 
+             userId={userId}
             color="#00c950"
             className="border-b-[.25px]  border-r-[.25px] border-l-0  border-slate-950"
           />
@@ -87,7 +90,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
           <DrawPath
             path={blueBoardPath}
             pathname="bluepPath"
-            drawBgColorOnPath={drawBlueColor}
+            drawBgColorOnPath={drawBlueColor} 
+             userId={userId}
             color="#2b7fff"
             className="border-b-[.25px]  border-r-[.25px]   border-slate-950"
           />
@@ -99,7 +103,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
           <DrawPath
             className=" -m-px border border-r-0 border-slate-950"
             path={yellowBoardPath}
-            drawBgColorOnPath={drawYellowColor}
+            drawBgColorOnPath={drawYellowColor} 
+            userId={userId}
             color="#fdc700"
             pathname="yellow"
           />

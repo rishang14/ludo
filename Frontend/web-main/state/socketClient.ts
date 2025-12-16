@@ -39,8 +39,7 @@ export const useSocket = create<SocketType>()((set, get) => ({
     };
 
     ws.onmessage = (e) => {
-      console.log(e);
-      const payload = JSON.parse(e.data); 
+      const payload = JSON.parse(e.data);
       get().handleMessage(payload);
     };
   },
@@ -65,10 +64,17 @@ export const useSocket = create<SocketType>()((set, get) => ({
           .getState()
           .initGameBoard(pawnMap, globaLBoardMap, gameBackbone);
         break;
-      case "dice_Rolled":  
-      console.log(payload,"payload"); 
-     useGameStore.getState().updateBackbone(payload.data.backBone);
-      break;
+      case "dice_Rolled":
+        useGameStore.getState().updateBackbone(payload.data.backbone);
+        break;
+      case "move_Pawn":
+        useGameStore.getState().updateBackbone(payload.data.backbone);
+        console.log("data: ", payload.data);
+        const { pawnId, pawnNewPos, pawnWon, capturedPawn } = payload.data;
+        const captured = capturedPawn.length > 0;
+        useGameStore
+          .getState()
+          .updateBoard(pawnId, captured, capturedPawn, pawnNewPos, pawnWon);
       default:
         break;
     }

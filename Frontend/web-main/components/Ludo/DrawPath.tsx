@@ -14,17 +14,19 @@ interface prop {
   pathname: string;
   drawBgColorOnPath: string[];
   className: string;
-  color: string;
+  color: string; 
+  userId:string
 }
 
 export const DrawPath = ({
   path,
   className,
-  drawBgColorOnPath,
+  drawBgColorOnPath, 
+  userId,
   color,
-}: prop) => {
+}: prop) => {  
   const coloured = new Set(drawBgColorOnPath);
-  const { pawnMap, boardMap ,movablePawn,safePlace} = useGameStore();  
+  const { pawnMap, boardMap ,safePlace} = useGameStore();  
   return (
     <>
       {path.map((p: string, i: number) => {
@@ -51,7 +53,7 @@ export const DrawPath = ({
             )}  
             {pawns.map((i) =>
               i.position === p ? ( 
-                <Pawn key={i.pId} id={i.pId} color={i.color} isFinished={i.isFinished}  isActive={movablePawn.has(i.pId)}/>
+                <Pawn key={i.pId} id={i.pId} color={i.color}  isFinished={i.isFinished}/>
               ) : null
             )}</div>
         );

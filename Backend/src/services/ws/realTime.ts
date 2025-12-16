@@ -16,7 +16,6 @@ export class RealTime {
     this.wss.on("connection", (socket) => {
       socket.on("message", (data) => {
         const msg = JSON.parse(data.toString());
-        console.log("Connection message", msg);
         this.handlers(socket, msg);
       });
 
@@ -36,7 +35,8 @@ export class RealTime {
 
   private async handlers(socket: any, msg: any) {
     switch (msg.type) {
-      case "join_User":
+      case "join_User": 
+      console.log("Join happened")
         this.room.joinRoom(
           `game:${msg.payload.gameId}`,
           `user:${msg.payload.userId}`,
@@ -57,17 +57,23 @@ export class RealTime {
         });
         break;
       case "roll_Dice":
-        console.log("message value in the rolldice", msg);
         const backBone = await GameManager.rollDice(
           msg.payload.gameId,
           msg.payload.userId
         );
-        console.log(backBone, "backbone");
         this.room.broadcastInRoom(`game:${msg.payload.gameId}`, {
           type: "dice_Rolled",
           data: backBone,
         });
-        break;
+        break; 
+      case "pawn_Clicked":  
+      const move= await GameManager.movePawn(msg.payload.gameId,msg.payload.userId,msg.payload.pId); 
+      console.log("val in the move section  for sending it to client",move);  
+      this.room.broadcastInRoom(`game:${msg.payload.gameId}`,{
+        type:"move_Pawn", 
+        data: move
+      }) 
+      break;
     }
   }
 }

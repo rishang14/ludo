@@ -10,8 +10,6 @@ export class RoomManager {
     if (!this.userWithSocket.has(userId)) {
       this.userWithSocket.set(userId, new Set());
     }  
-    console.log("User id joined",userId); 
-    console.log("gameId joined",gameId)
     this.gamwWithSocket.get(gameId)?.add(socket);
     this.userWithSocket.get(userId)?.add(socket);
   }
