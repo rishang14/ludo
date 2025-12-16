@@ -219,12 +219,15 @@ export class GameManager {
   ) { 
 
     const boardVal = await RedisInstance.getOneBoardCell(gameId, cellId); 
-    let pawns: string[] = boardVal;
+    let pawns: string[] = boardVal; 
+    console.log("cell value of the pawn",pawns)
     if (captured) {
       pawns = pawns.filter((i) => i != pId);
     } else {
       pawns.push(pId);
-    }
+    }  
+    pawns=pawns.filter(i => i !== ''); 
+    console.log("i am pushing this into the cell in the game",pawns)
     await RedisInstance.setBoard(gameId, cellId, pawns);
   }
 
@@ -233,18 +236,20 @@ export class GameManager {
     currPawn: pawn,
     gameId: string
   ): Promise<capturedReturnType> {
-    const board: string[] = await RedisInstance.getOneBoardCell(gameId, newPos);
-
-    if (board.length === 0) {
+    const board = await RedisInstance.getOneBoardCell(gameId, newPos); 
+    if (board.length === 0){
       return { captruedSuccess: false, capturedPawn: null };
-    }
-    for (const p of board) {
-      if (p.charAt(0) === currPawn.pId.charAt(0)) {
-        return { captruedSuccess: false, capturedPawn: null };
+    }  
+    console.log("whole board value in the capture pawn",board)
+    let captruedSuccess=false; 
+    let capturedPawn=null
+    for (let p=0;p<board.length;p++) { 
+      if (board[p]?.charAt(0) === currPawn.pId.charAt(0)) {
+        continue;
       }
-      return { capturedPawn: p, captruedSuccess: true };
+     capturedPawn =  board[p] as string; captruedSuccess =  true ;
     }
-    return { captruedSuccess: false, capturedPawn: null };
+    return {captruedSuccess, capturedPawn};
   }
 
   public static async movePawn(gameId: string, userId: string, pId: string) {
@@ -266,15 +271,17 @@ export class GameManager {
       pawnPath,
       currPawn,
       +diceVal
-    );
+    ); 
+
     let captured: string = "";
     let nextTurn: boolean = false;
-    if (!globalSafePlace.has(newPos)) {
+    if (!globalSafePlace.has(newPos)) { 
       const { capturedPawn, captruedSuccess } = await this.capturePawn(
         newPos,
         currPawn,
         gameId
-      );
+      ); 
+      console.log("captured pawn",capturedPawn) 
       if (captruedSuccess && capturedPawn) {
         captured = capturedPawn ?? "";
         //update the pawn new pos of the curpawn to newpos and also update the board
@@ -285,8 +292,9 @@ export class GameManager {
           false,
           capturedPawn
         );
-        await this.updateBoardVal(gameId, captruedSuccess, capturedPawn, pId); //reomved from the old cell
-        await this.updateBoardVal(gameId, false, capturedPawn, capturedPawn); // put it in the new cell
+        await this.updateBoardVal(gameId, captruedSuccess, capturedPawn,newPos); //reomved from the old cell
+        await this.updateBoardVal(gameId, false, capturedPawn, capturedPawn); // put it in the new cell 
+        console.log("updation triggers in the capturedone ")
         nextTurn = true;
       }
     }
@@ -304,7 +312,8 @@ export class GameManager {
     } 
 
     await this.savePawnValue(gameId, false, pId, false, newPos); // saved for the normal value  like normal nothing happend
-    await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
+    await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board 
+    await this.updateBoardVal(gameId,true,pId,currPawn.position); //dele from the old one 
     const newBackBone: Record<backBone, any> = this.NewBackBone(
       [],
       1,

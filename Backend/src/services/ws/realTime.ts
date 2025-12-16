@@ -68,7 +68,7 @@ export class RealTime {
         break; 
       case "pawn_Clicked":  
       const move= await GameManager.movePawn(msg.payload.gameId,msg.payload.userId,msg.payload.pId); 
-      console.log("val in the move section  for sending it to client",move);  
+      console.log("val for move",move);  
       this.room.broadcastInRoom(`game:${msg.payload.gameId}`,{
         type:"move_Pawn", 
         data: move

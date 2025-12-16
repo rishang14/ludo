@@ -84,7 +84,7 @@ export const yellowBoardPath = [
   "G13",
 ];
 
-export const globalSafePlace:Set<string> =new Set(["G1", "R1", "Y1", "B1", "G8", "Y8", "B8", "R8"]);
+export const globalSafePlace:Set<string> =new Set(["G1", "R1", "Y1", "B1", "G9", "Y9", "B9", "R9"]);
 
 export type redSafePlace = ["R1", "B8"];
 export type blueSafePlace = ["B1", "Y8"];
