@@ -4,10 +4,8 @@ import PlaywithCompCard from "@/components/Home/playWithCompCard";
 import { PlaywithfriendCard } from "@/components/Home/playWithFriendCard";
 import { getOngoingGame, getSession } from "@/lib/action/server.action";
 import { User } from "better-auth";
-
 import { Dice1, Dice6 } from "lucide-react";
 import { redirect } from "next/navigation";
-
 export default async function Page() {
   const data: User = await getSession();
   if (!data) {
@@ -44,7 +42,7 @@ export default async function Page() {
           <Logoutbutton />
         </div>
         <div className="flex gap-2  flex-wrap justify-center items-center">
-          <PlaywithfriendCard />
+          <PlaywithfriendCard  userId={data.id}/>
           <PlaywithCompCard />
         </div>
       </div>

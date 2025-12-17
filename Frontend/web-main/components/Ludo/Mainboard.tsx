@@ -20,7 +20,7 @@ import {
 } from "@/lib/constant";
 import { useGameStore } from "@/state/gameStore";
 import { useSocket } from "@/state/socketClient";
-import React, { useEffect, useId } from "react";
+import React, { useEffect } from "react";
 
 type LudoProp = {
   gameId: string;

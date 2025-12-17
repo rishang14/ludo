@@ -4,7 +4,11 @@ import { SharedCard } from "../Global/sharedCard";
 import { useState } from "react";
 import { Creategameform } from "./createGameForm";
 
-export const PlaywithfriendCard = () => {
+
+type PlaywithFriendProp={
+  userId:string
+}
+export const PlaywithfriendCard:React.FC<PlaywithFriendProp> = ({userId}) => {
   const [open, setopen] = useState<boolean>(false);
   return (
     <>
@@ -20,7 +24,7 @@ export const PlaywithfriendCard = () => {
         onClick={() =>setopen(true)}
       />  
 
-      <Creategameform isDialogOpen={open} setDialogOpen={setopen}/>
+      <Creategameform isDialogOpen={open} userId={userId} setDialogOpen={setopen}/>
     </>
   );
 };

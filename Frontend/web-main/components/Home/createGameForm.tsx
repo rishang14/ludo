@@ -1,20 +1,24 @@
 "use client"
+import type React from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Button } from "../ui/button"
 import { useForm } from "react-hook-form"
-import type React from "react"
 import axios from "axios"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
+
 
 type dialogProp = {
-  isDialogOpen: boolean
+  isDialogOpen: boolean 
+  userId:string
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOpen }) => {  
-  console.log(process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT,"value of endpoint")
+export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOpen,userId }) => {  
+  const router=useRouter();
   const {
     register,
     handleSubmit,
@@ -36,7 +40,11 @@ export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOp
         emails:emails
       },{withCredentials:true})    
       
-      console.log(createGame,"gamecreated")
+      setDialogOpen(false);
+      if(createGame.data.success){
+        toast.success("Game created Successfully",{duration:3000,description:"Pls tell you friend to refresh home page"})  
+        router.push(`game/${createGame.data.data.id}/user/${userId}`);
+      } 
     } catch (error:any) {
       console.log(error,"error");
     }
