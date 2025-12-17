@@ -1,7 +1,5 @@
 import { globalSafePlace } from "@/lib/constant";
 import { create } from "zustand";
-import { calcMove, getPathOfPawn } from "./gameHleper";
-import { pid } from "process";
 
 type colors = "Red" | "Blue" | "Green" | "Yellow";
 export type pawn = {
@@ -18,7 +16,11 @@ interface gameBoard {
   boardMap: Map<string, Set<string>>;
   currentTurn: string;
   currentUserTurn: string;
-  canDiceRoll: boolean;
+  canDiceRoll: boolean; 
+  winnerFound:boolean,  
+  winnerName:string, 
+  winnerColor:string, 
+  setWinnerFound:(winnerName:string,winnerColor:string)=>void
   canPawnMove: boolean;
   winnerOrders: string[];
   updateBackbone: (gState: any) => void;
@@ -47,12 +49,20 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
   boardMap: new Map(),
   safePlace: new Set(globalSafePlace),
   canDiceRoll: true,
-  canPawnMove: false,
+  canPawnMove: false, 
+  winnerFound:false, 
+  winnerColor:"", 
+  winnerName:"",
   winnerOrders: [],
   diceVal: 1,
   currentUserTurn: "",
   currentTurn: "Red",
-  movablePawn: new Set(),
+  movablePawn: new Set(), 
+
+
+  setWinnerFound:(winnerName,winnerColor)=>{
+    set({winnerFound:true , winnerColor,winnerName})
+  },
 
   initGameBoard: (pMap, gMap, gState) => {
     const pawnMap = new Map<string, pawn>();
@@ -118,7 +128,6 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
 
     board.get(oldPos)?.delete(pId);
     board.get(newPos)?.add(pId);
-
     set({ boardMap: board });
   },
 

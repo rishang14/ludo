@@ -81,7 +81,13 @@ export const useSocket = create<SocketType>()((set, get) => ({
         redirectUserTohomeWithToast(payload.data as string);
         break;
       case "user_Joined":
-        userJoinedBroadCast(payload.data);
+        userJoinedBroadCast(payload.data);  
+        break; 
+      case "winner_Found": 
+         console.log(payload,"payload")   
+         const {winnerName,winnerColor}= payload.data
+         useGameStore.getState().setWinnerFound(winnerName,winnerColor); 
+         break;
       default:
         break;
     }

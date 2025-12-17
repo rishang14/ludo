@@ -16,6 +16,7 @@ import { RedisInstance } from "../redis/redisClient";
 import { calcMove } from "../../lib/helper";
 import { GameRepo } from "../../repositry/game.repositry";
 import { UserRepo } from "../../repositry/user.repositry";
+import { wss } from "../..";
 
 export class GameManager{
   public static totalPlayer: number = 0;
@@ -92,7 +93,7 @@ export class GameManager{
     };
   }
 
-  private static async getTeamPawn(gameId: string, p: string) {
+  private static async getTeamPawn(gameId: string, p: string){
     const pawns: pawn[] = [];
 
     for (let i = 1; i <= 4; i++) {
@@ -263,7 +264,8 @@ export class GameManager{
   }
 
   public static async movePawn(gameId: string, userId: string, pId: string) {
-    const gameState = await RedisInstance.getGameStatus(gameId);
+    const gameState = await RedisInstance.getGameStatus(gameId); 
+    const gameDetails=await GameRepo.getGame(gameId); 
     const movablePawns: string[] = JSON.parse(gameState.movablePawns!);
     const diceVal = JSON.parse(gameState.diceVal!);
     const color = JSON.parse(gameState.currentTurn!);
@@ -311,13 +313,26 @@ export class GameManager{
         nextTurn = true;
       }
     }
-    if (pathAcheived){ 
-      console.log("Inside the path Achieved one")
-      await RedisInstance.updatePawnVlalue(gameId, currPawn.pId, {
+    if (pathAcheived){   
+        await RedisInstance.updatePawnVlalue(gameId, currPawn.pId, {
         ...currPawn,
         isFinished: true,
         isHome,
       });
+      const allpawn= await this.getTeamPawn(gameId,currPawn.pId.charAt(0))  
+      let totalFinishedPawn=allpawn.filter(i => i.isFinished === true);  
+      console.log("length of finished pawn",totalFinishedPawn)
+      if(totalFinishedPawn.length ===4){  
+        const getUser= await UserRepo.getUserById(userId)
+        wss.broadcastToUsers(gameId,"winner_Found",{ 
+          winnerColor: currPawn.color, 
+          userId:userId, 
+          winnerName:getUser?.name, 
+          gameId:gameId
+        })   
+        return;
+      } 
+         
       await this.updateBoardVal(gameId, true, pId, currPawn.position); //reomved from the global board
       nextTurn = true;
     }

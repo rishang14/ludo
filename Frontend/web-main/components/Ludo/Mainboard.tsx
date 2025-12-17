@@ -21,6 +21,7 @@ import {
 import { useGameStore } from "@/state/gameStore";
 import { useSocket } from "@/state/socketClient";
 import React, { useEffect } from "react";
+import { WinScreen } from "../Global/winner.model";
 
 type LudoProp = {
   gameId: string;
@@ -28,7 +29,7 @@ type LudoProp = {
 };
 
 const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
-  const { currentTurn, diceVal, currentUserTurn } = useGameStore();
+  const { winnerFound, diceVal, currentUserTurn } = useGameStore();
   const { connectToSocket, disconnectSocket, sendToServer, isConnected } =
     useSocket();
 
@@ -45,7 +46,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
     }
   }, [isConnected, gameId, userId]); 
   console.log(userId,"userId in main board")
-    return (
+    return ( 
+      <>
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
       <div className=" space-y-2">
         <h2 className="text-white text-center  text-4xl font-serif">
@@ -117,7 +119,9 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
         </h2>
         {currentUserTurn === userId && <Dice  gameId={gameId} userId={userId}/>}
       </div>
-    </div>
+    </div>  
+   {winnerFound &&  <WinScreen/>}
+  </>
   );
 };
 

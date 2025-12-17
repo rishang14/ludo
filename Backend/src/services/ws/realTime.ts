@@ -43,7 +43,7 @@ export class RealTime {
           `user:${msg.payload.userId}`,
           socket
         );  
-        const userName= await UserRepo.getUserById(msg.payload.userId)
+        const user= await UserRepo.getUserById(msg.payload.userId)
         const wholeBoard = await GameManager.getWholeGameState(
           msg.payload.gameId
         );
@@ -55,7 +55,7 @@ export class RealTime {
         );
         this.room.broadcastInRoom(`game:${msg.payload.gameId}`, {
           type: "user_Joined",
-          data:  userName,
+          data:  user?.name,
         });
         break;
       case "roll_Dice":
@@ -79,9 +79,9 @@ export class RealTime {
     }
   }   
 
-  public  broadcastToUsers(gameId:string,details:any){
+  public  broadcastToUsers(gameId:string,type:string,details:any){
       this.room.broadcastInRoom(`game:${gameId}`,{
-        type:"user_Exited", 
+        type:type, 
         data:details
       })   
   }

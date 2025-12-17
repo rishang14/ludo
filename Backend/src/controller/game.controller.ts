@@ -118,8 +118,11 @@ export const exitGame = async (req: Request, res: Response) => {
     if (!validId.safeParse(gameId)) {
       throw new Error("Invalid gameId");
     } 
-    wss.broadcastToUsers(gameId,req.user?.name) 
-    
+    wss.broadcastToUsers(gameId,"user_Exited",req.user?.name) 
+   const gameExist = await GameRepo.getGame(gameId); 
+   if(!gameExist){
+    return res.json( new ApiResponse(200,"", "Game already deleted"))
+   }
     const deletegame = await GameManager.exitOrDeleteGame(gameId);  
 
   //todo send via socket of the gameId connected user that user exited the game game-canceled and clear the whole game board  

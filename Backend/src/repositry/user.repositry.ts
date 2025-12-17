@@ -10,12 +10,12 @@ export class UserRepo {
     return user;
   }
  
- public static async getUserById(userId:string){
+ public static async getUserById(userId:string):Promise<User | null>{
   const user= await prisma.user.findFirst({where:{id:userId}}); 
   if(!user){
-    return; 
+    return null; 
   } 
-  return user.name;
+  return user;
  }
   
 
