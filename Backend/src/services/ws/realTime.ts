@@ -58,7 +58,8 @@ export class RealTime {
           data:  user?.name,
         });
         break;
-      case "roll_Dice":
+      case "roll_Dice": 
+      console.log("roll dice val",msg)
         const backBone = await GameManager.rollDice(
           msg.payload.gameId,
           msg.payload.userId

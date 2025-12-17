@@ -7,7 +7,7 @@ export class RedisInstance {
   private static pawnKey(gameId: string) {
     return `${gameId}:pawn`;
   }
-  private static boardKey(gameId: string) {
+  private static boardKey(gameId: string){
     return `${gameId}:board`;
   }
 
@@ -55,7 +55,19 @@ export class RedisInstance {
 
     return JSON.parse(pawn);
   } 
-  public static async getUserWithColor(gameId:string,userId:string){
+  public static async setUserWithColor(gameId:string,userId:string,val:string){
+    if(!this.client){
+      throw new Error("Redis is not connected"); 
+    }  
+    try {
+    const key=this.userWithColorKey(gameId)
+    const setUserWithColor=await this.client.HSET(key,userId,JSON.stringify(val)); 
+    } catch (error) {
+       console.log("errorwhile seting up the userwith color", error)
+    }
+    }  
+
+      public static async getUserWithColor(gameId:string,userId:string){
     const key = this.userWithColorKey(gameId); 
     if(!this.client){
       throw new Error("Redis is not connected")
@@ -67,21 +79,10 @@ export class RedisInstance {
     } 
     return JSON.parse(userWithColor);
    } catch (error) {
-    console.log("error while getting up userwith colr",error)
+    console.log("error while getting up userwith color",error)
    }
   }  
 
-  public static async setUserWithColor(gameId:string,userId:string,val:string){
-    if(!this.client){
-      throw new Error("Redis is not connected"); 
-    }  
-    try {
-          const key=this.userWithColorKey(gameId)
-    const setUserWithColor=await this.client.hSet(key,userId,JSON.stringify(val)); 
-    } catch (error) {
-       console.log("errorwhile seting up the userwith color", error)
-    }
-    }
 
   public static async getAllPawn(gameId: string) {
     if (!this.client) {

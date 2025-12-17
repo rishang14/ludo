@@ -31,12 +31,11 @@ export class GameManager{
     this.totalPlayer = totlPlayerIds.length;
     for (let i = 0; i < totlPlayerIds.length; i++) {
       for (const p of dirstributePawn[i]!) {
-        if (totlPlayerIds[i] && !this.userIdWithColor.get(totlPlayerIds[i]!)) {
-          this.userIdWithColor.set(
-            totlPlayerIds[i]!,
-            mapColor[p.charAt(0)] as colors
-          );  
-          await RedisInstance.setUserWithColor(gameId,totlPlayerIds[i] as string, mapColor[p.charAt(0)] as colors )
+        if (totlPlayerIds[i]) {
+          const userwithColor= await RedisInstance.getUserWithColor(gameId,totlPlayerIds[i] as string) 
+          if(!userwithColor){
+            await RedisInstance.setUserWithColor(gameId,totlPlayerIds[i] as string, mapColor[p.charAt(0)] as colors )
+          } 
         }
         this.turns.add(totlPlayerIds[i]!);
         const pawn: pawn = {
@@ -69,11 +68,12 @@ export class GameManager{
         );
         return;
       }
-      if ((p.key as Partial<backBone>) === "currentTurn") {
+      if ((p.key as Partial<backBone>) === "currentTurn") { 
+         const color=await RedisInstance.getUserWithColor(gameId,totlPlayerIds[0]!);
         await RedisInstance.updateBoardStateKey(
           gameId,
           p.key,
-          this.userIdWithColor.get(totlPlayerIds[0]!)
+          color
         );
         return;
       }
@@ -171,7 +171,7 @@ export class GameManager{
 
   public static async rollDice(gameId: string, userId: string) {
     const gameState = await RedisInstance.getGameStatus(gameId);
-
+  console.log("userId",userId,"gameId",gameId);
     if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
