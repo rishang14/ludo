@@ -1,3 +1,6 @@
+Video demo  :[link Reaad this currently ](https://www.linkedin.com/feed/update/urn:li:activity:7407095633913839616/) 
+
+
 Note: All of these code every single line of logic and architecture is written by me without help of any ai tools cuz i don't use it 
 
 Ps: i am not gonna tell you about the ui portion 🫡🫡
