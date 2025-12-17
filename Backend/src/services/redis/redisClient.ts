@@ -13,7 +13,10 @@ export class RedisInstance {
 
   private static boardStateKey(gameId: string) {
     return `${gameId}:state`;
-  }
+  } 
+  private static userWithColorKey(gameId:string){
+    return `${gameId}:userWithKey`  
+  } 
 
   public static async initialize() {
     if (this.client) {
@@ -51,7 +54,34 @@ export class RedisInstance {
     }
 
     return JSON.parse(pawn);
-  }
+  } 
+  public static async getUserWithColor(gameId:string,userId:string){
+    const key = this.userWithColorKey(gameId); 
+    if(!this.client){
+      throw new Error("Redis is not connected")
+    } 
+   try {
+      const userWithColor= await this.client.hGet(key,userId); 
+    if(!userWithColor){
+      throw new Error("Invalid gameId or pawnId"); 
+    } 
+    return JSON.parse(userWithColor);
+   } catch (error) {
+    console.log("error while getting up userwith colr",error)
+   }
+  }  
+
+  public static async setUserWithColor(gameId:string,userId:string,val:string){
+    if(!this.client){
+      throw new Error("Redis is not connected"); 
+    }  
+    try {
+          const key=this.userWithColorKey(gameId)
+    const setUserWithColor=await this.client.hSet(key,userId,JSON.stringify(val)); 
+    } catch (error) {
+       console.log("errorwhile seting up the userwith color", error)
+    }
+    }
 
   public static async getAllPawn(gameId: string) {
     if (!this.client) {
@@ -201,12 +231,13 @@ export class RedisInstance {
  public static async cleanInMemory(gameId:string){
     const cellkey=this.boardKey(gameId); 
     const pawnKey=this.pawnKey(gameId); 
-    const state=this.boardStateKey(gameId);   
+    const state=this.boardStateKey(gameId); 
+    const userWithColor= this.userWithColorKey(gameId);  
 
     if(!this.client){
       throw new Error("Redis is not connected")  
     }    
-     const deleted= await this.client.unlink([cellkey,pawnKey,state]); 
+     const deleted= await this.client.unlink([cellkey,pawnKey,state,userWithColor]); 
      console.log("we are deleted from the redis instance",deleted);
     return deleted;
  }

@@ -38,12 +38,10 @@ interface gameBoard {
   updateBoardState: (pId: string, oldPos: string, newPos: string) => void;
   movablePawn: Set<string>;
   initGameBoard: (pawnMap: any, globalBoard: any, gameState: any) => void;
-  getMovablePawn: (diceVal: number) => string[];
   diceVal: number;
   safePlace: Set<string>;
   capturePawn: (newPos: string, currentpawn: pawn) => boolean;
   movePawn: (pawnId: string) => void;
-  rollDice: () => void;
 }
 
 export const useGameStore = create<gameBoard>()((set, get) => ({
@@ -217,62 +215,9 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
 
     set({ pawnMap: allpawn, boardMap: globaLBoard, canPawnMove: false });
     if (diceVal !== 6) {
-      get().nextTurn();
     }
 
     return;
   },
 
-  getMovablePawn: (diceVal: number) => {
-    const currentTurnPawnPos: string[] = [];
-    const turn = get().currentTurn;
-    const pawnPath = getPathOfPawn({ color: turn as any });
-    for (let i = 1; i <= 4; i++) {
-      const pId = `${turn.charAt(0)}P${i}`;
-      const pawn = get().pawnMap.get(pId);
-      if (!pawn) continue;
-
-      if (pawn?.isHome) {
-        if (diceVal === 6) {
-          currentTurnPawnPos.push(pawn.pId);
-        }
-        continue;
-      }
-
-      if (!pawn?.isFinished) {
-        const { newPos } = calcMove(pawnPath, pawn, diceVal);
-        if (newPos != pawn.position) {
-          currentTurnPawnPos.push(pawn.pId);
-        }
-      }
-    }
-
-    return currentTurnPawnPos;
-  },
-
-  rollDice: () => {
-    const diceVal = Math.floor(Math.random() * 6) + 1;
-    let currentTurnPawnPos: string[] = get().getMovablePawn(diceVal);
-
-    set({ canPawnMove: true });
-    const movable = get().movablePawn;
-    movable.clear();
-
-    if (currentTurnPawnPos.length === 0) {
-      set({ diceVal });
-      get().nextTurn();
-      return;
-    }
-    currentTurnPawnPos.forEach((v) => movable.add(v));
-
-    if (currentTurnPawnPos.length === 1) {
-      set({ diceVal, movablePawn: movable, canDiceRoll: false });
-      get().movePawn(currentTurnPawnPos[0] as string);
-      return;
-    }
-
-    // this is pushing into movable item
-    set({ diceVal, movablePawn: movable, canDiceRoll: false });
-    return;
-  },
 }));

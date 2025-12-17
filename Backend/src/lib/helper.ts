@@ -16,13 +16,16 @@ export const calcMove = (
 
   const currentPos = pawnPath.indexOf(currPawn?.position);
   const totalSize = pawnPath.length;
-  if (currentPos + diceVal < totalSize) {
+  if (currentPos + diceVal < totalSize) { 
+    console.log("new pos of the pawn", pawnPath[currentPos+diceVal]);
     return {
       newPos: pawnPath[currentPos + diceVal] as string,
       pathAcheived: false,
       isHome: false,
     };
-  } else if (currentPos + diceVal == totalSize) {
+  } else if (currentPos + diceVal == totalSize) { 
+    console.log("new pos of the pawn for winn",pawnPath[currentPos+diceVal]); 
+    console.log("for winning totallength",totalSize,"got the dice val",currentPos+diceVal)
     return {
       newPos: "", 
       pathAcheived: true,

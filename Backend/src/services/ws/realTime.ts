@@ -36,7 +36,7 @@ export class RealTime {
   private async handlers(socket: any, msg: any) {
     switch (msg.type) {
       case "join_User": 
-      console.log("Join happened")
+      console.log("Join happened",msg)
         this.room.joinRoom(
           `game:${msg.payload.gameId}`,
           `user:${msg.payload.userId}`,
@@ -66,9 +66,9 @@ export class RealTime {
           data: backBone,
         });
         break; 
-      case "pawn_Clicked":  
-      const move= await GameManager.movePawn(msg.payload.gameId,msg.payload.userId,msg.payload.pId); 
-      console.log("val for move",move);  
+      case "pawn_Clicked":   
+      console.log("pawnClicked getting userId or not",msg)
+      const move= await GameManager.movePawn(msg.payload.gameId,msg.payload.userId,msg.payload.pId);   
       this.room.broadcastInRoom(`game:${msg.payload.gameId}`,{
         type:"move_Pawn", 
         data: move

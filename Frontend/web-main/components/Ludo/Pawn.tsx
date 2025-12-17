@@ -47,7 +47,7 @@ export const Pawn = ({
       }}
     >
       <svg
-        width={movablePawn.has(id) ?size+5 :size}
+        width={movablePawn.has(id) ?size+5 :isFinished ? 20 : size}
         id={id}
         height={movablePawn.has(id) ? size+5 :size}
         viewBox="0 0 100 100"

@@ -24,7 +24,6 @@ export const calcMove = (
   currPawn: pawn,
   diceVal: number
 ): calcMoveReturn => {
-  //todo have to implement the kill logic here also
 
   if (currPawn.isHome) {
     return {
