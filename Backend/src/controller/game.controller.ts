@@ -6,6 +6,7 @@ import { GameRepo } from "../repositry/game.repositry";
 import { ApiResponse } from "../utils/apiResponse";
 import { UserRepo } from "../repositry/user.repositry";
 import { GameManager } from "../services/game/gameManager";
+import { wss } from "..";
 
 export const initGame = async (req: Request, res: Response) => {
   try {
@@ -117,9 +118,11 @@ export const exitGame = async (req: Request, res: Response) => {
     if (!validId.safeParse(gameId)) {
       throw new Error("Invalid gameId");
     } 
+    wss.broadcastToUsers(gameId,req.user?.name) 
+    
     const deletegame = await GameManager.exitOrDeleteGame(gameId);  
 
-  //todo send via socket of the gameId connected user that user exited the game game-canceled and clear the whole game board
+  //todo send via socket of the gameId connected user that user exited the game game-canceled and clear the whole game board  
     return res.json(
       new ApiResponse(200, deletegame, "Game removed successfully")
     );

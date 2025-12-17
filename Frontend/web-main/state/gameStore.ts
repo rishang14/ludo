@@ -29,7 +29,7 @@ interface gameBoard {
     newPos: string,
     isFinished: boolean
   ) => void;
-  updatePawnState: (
+  updatePawnState:(
     pId: string,
     captured: boolean,
     isFinished: boolean,
@@ -40,8 +40,6 @@ interface gameBoard {
   initGameBoard: (pawnMap: any, globalBoard: any, gameState: any) => void;
   diceVal: number;
   safePlace: Set<string>;
-  capturePawn: (newPos: string, currentpawn: pawn) => boolean;
-  movePawn: (pawnId: string) => void;
 }
 
 export const useGameStore = create<gameBoard>()((set, get) => ({
@@ -141,83 +139,83 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
     set({pawnMap: pawns})
   },
 
-  capturePawn: (newPos, currentpawn): boolean => {
-    const boardMap = new Map(get().boardMap);
-    const allpawn = new Map(get().pawnMap);
-    const pawnsAtNewPos = boardMap.get(newPos);
-    if (!pawnsAtNewPos || pawnsAtNewPos.size === 0) {
-      return false;
-    }
+  // capturePawn: (newPos, currentpawn): boolean => {
+  //   const boardMap = new Map(get().boardMap);
+  //   const allpawn = new Map(get().pawnMap);
+  //   const pawnsAtNewPos = boardMap.get(newPos);
+  //   if (!pawnsAtNewPos || pawnsAtNewPos.size === 0) {
+  //     return false;
+  //   }
 
-    for (let p of pawnsAtNewPos) {
-      if (p.charAt(0) === currentpawn.pId.charAt(0)) return false;
-      const capturedpawn = allpawn.get(p);
-      // console.log(" that pawn  ",capturedpawn);
-      if (!capturedpawn) return false;
-      allpawn.set(capturedpawn.pId, {
-        ...capturedpawn,
-        isHome: true,
-        position: capturedpawn.pId,
-      });
-      boardMap.get(p)?.add(p);
-      boardMap.get(newPos)?.delete(p);
-    }
-    boardMap.get(newPos)?.add(currentpawn.pId);
-    allpawn.set(currentpawn.pId, { ...currentpawn, position: newPos });
+  //   for (let p of pawnsAtNewPos) {
+  //     if (p.charAt(0) === currentpawn.pId.charAt(0)) return false;
+  //     const capturedpawn = allpawn.get(p);
+  //     // console.log(" that pawn  ",capturedpawn);
+  //     if (!capturedpawn) return false;
+  //     allpawn.set(capturedpawn.pId, {
+  //       ...capturedpawn,
+  //       isHome: true,
+  //       position: capturedpawn.pId,
+  //     });
+  //     boardMap.get(p)?.add(p);
+  //     boardMap.get(newPos)?.delete(p);
+  //   }
+  //   boardMap.get(newPos)?.add(currentpawn.pId);
+  //   allpawn.set(currentpawn.pId, { ...currentpawn, position: newPos });
 
-    set({ pawnMap: allpawn, boardMap, canDiceRoll: true });
-    return true;
-  },
+  //   set({ pawnMap: allpawn, boardMap, canDiceRoll: true });
+  //   return true;
+  // },
 
-  movePawn: (pawnId: string) => {
-    set({ canDiceRoll: true });
-    const currnetTurnPawns = get().movablePawn;
-    const diceVal = get().diceVal;
-    const allpawn = new Map(get().pawnMap);
-    const currentTurn = get().currentTurn;
-    const globaLBoard = new Map(get().boardMap);
-    const getPawnPath = getPathOfPawn({ color: currentTurn as any });
-    if (!currnetTurnPawns.has(pawnId)) {
-      // console.log("You can't move the pawn");
-      return;
-    }
-    const currPawn = allpawn.get(pawnId);
-    if (!currPawn) return;
-    const { newPos, pathAcheived, isHome } = calcMove(
-      getPawnPath,
-      currPawn,
-      diceVal
-    );
+  // movePawn: (pawnId: string) => {
+  //   set({ canDiceRoll: true });
+  //   const currnetTurnPawns = get().movablePawn;
+  //   const diceVal = get().diceVal;
+  //   const allpawn = new Map(get().pawnMap);
+  //   const currentTurn = get().currentTurn;
+  //   const globaLBoard = new Map(get().boardMap);
+  //   const getPawnPath = getPathOfPawn({ color: currentTurn as any });
+  //   if (!currnetTurnPawns.has(pawnId)) {
+  //     // console.log("You can't move the pawn");
+  //     return;
+  //   }
+  //   const currPawn = allpawn.get(pawnId);
+  //   if (!currPawn) return;
+  //   const { newPos, pathAcheived, isHome } = calcMove(
+  //     getPawnPath,
+  //     currPawn,
+  //     diceVal
+  //   );
 
-    if (!get().safePlace.has(newPos)) {
-      const captured = get().capturePawn(newPos, currPawn);
-      if (captured) {
-        console.log("returned from here");
-        return;
-      }
-    }
+  //   if (!get().safePlace.has(newPos)) {
+  //     const captured = get().capturePawn(newPos, currPawn);
+  //     if (captured) {
+  //       console.log("returned from here");
+  //       return;
+  //     }
+  //   }
 
-    if (currPawn.position === newPos) {
-      set({ canPawnMove: true });
-      return;
-    }
+  //   if (currPawn.position === newPos) {
+  //     set({ canPawnMove: true });
+  //     return;
+  //   }
 
-    if (pathAcheived) {
-      allpawn.set(currPawn.pId, { ...currPawn, isFinished: true, isHome }); //  it is winner
-      globaLBoard.get(currPawn.position)?.delete(currPawn.pId); // remove this pawn from the gloabal paht
-      set({ pawnMap: allpawn, boardMap: globaLBoard, canPawnMove: false });
-      return;
-    }
+  //   if (pathAcheived) {
+  //     allpawn.set(currPawn.pId, { ...currPawn, isFinished: true, isHome }); //  it is winner
+  //     globaLBoard.get(currPawn.position)?.delete(currPawn.pId); // remove this pawn from the gloabal paht
+  //     set({ pawnMap: allpawn, boardMap: globaLBoard, canPawnMove: false });
+  //     return;
+  //   }
 
-    allpawn.set(currPawn.pId, { ...currPawn, position: newPos, isHome });
-    globaLBoard.get(currPawn.position)?.delete(currPawn.pId);
-    globaLBoard.get(newPos)?.add(currPawn.pId);
+  //   allpawn.set(currPawn.pId, { ...currPawn, position: newPos, isHome });
+  //   globaLBoard.get(currPawn.position)?.delete(currPawn.pId);
+  //   globaLBoard.get(newPos)?.add(currPawn.pId);
 
-    set({ pawnMap: allpawn, boardMap: globaLBoard, canPawnMove: false });
-    if (diceVal !== 6) {
-    }
+  //   set({ pawnMap: allpawn, boardMap: globaLBoard, canPawnMove: false });
+  //   if (diceVal !== 6) {
+  //   }
 
-    return;
-  },
+  //   return;
+  // },
 
 }));

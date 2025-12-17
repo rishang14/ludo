@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
@@ -16,7 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={geist.className}>{children}</body>
+      <body className={geist.className}>{children}
+         <Toaster/>
+        </body> 
     </html>
   );
 }

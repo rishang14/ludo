@@ -16,9 +16,8 @@ import { RedisInstance } from "../redis/redisClient";
 import { calcMove } from "../../lib/helper";
 import { GameRepo } from "../../repositry/game.repositry";
 import { UserRepo } from "../../repositry/user.repositry";
-import { useId } from "react";
 
-export class GameManager {
+export class GameManager{
   public static totalPlayer: number = 0;
   private static turns: Set<string> = new Set();
   private static userIdWithColor: Map<string, string> = new Map();
@@ -360,8 +359,8 @@ export class GameManager {
         await UserRepo.updateUserData(i, { onGoingGame: null });
       }
       const gameData = await GameRepo.deleteGame(gameId);
-      const data = await RedisInstance.cleanInMemory(gameId);
-      return true;
+      const data = await RedisInstance.cleanInMemory(gameId);  
+       return true;
     } catch (error) {
       console.log("Error in game manager", error);
       throw new Error("Error while deleting the gameData and redis instance");

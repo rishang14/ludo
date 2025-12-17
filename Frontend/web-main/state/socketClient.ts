@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useGameStore } from "./gameStore";
+import { redirectUserTohomeWithToast } from "@/lib/ws.helper";
 
 type JoinedUser = {
   gameId: string;
@@ -75,6 +76,13 @@ export const useSocket = create<SocketType>()((set, get) => ({
         useGameStore
           .getState()
           .updateBoard(pawnId, captured, capturedPawn, pawnNewPos, pawnWon);
+        break;
+
+      case "user_Exited":
+        {
+          redirectUserTohomeWithToast(payload.data as string);
+        }
+        break;
       default:
         break;
     }

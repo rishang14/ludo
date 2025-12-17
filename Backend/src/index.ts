@@ -10,7 +10,7 @@ import { GameRoutes } from "./routes";
 
 export const app = express();
 export const server = http.createServer(app);
-export const ws = new RealTime(server);
+export const  wss = new RealTime(server);
 
 app.use(
   cors({

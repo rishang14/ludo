@@ -75,5 +75,12 @@ export class RealTime {
       }) 
       break;
     }
+  }   
+
+  public  broadcastToUsers(gameId:string,details:any){
+      this.room.broadcastInRoom(`game:${gameId}`,{
+        type:"user_Exited", 
+        data:details
+      })   
   }
 }

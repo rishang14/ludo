@@ -379,4 +379,17 @@ export const pathToWin: Record<colors, string[]> = {
     Green: greenPawnPathToWin,
     Blue: bluePawnPathToWin,
     Yellow: yellowPawnPathToWin,
-  };
+  };         
+
+
+
+//Todos  
+// here remaining for the backend  
+// add winning order and  chat system 
+// make the user exit from the room if any one left kill that room  
+// build the bot   
+
+//for frontend 
+// if pawn is single move on to thier own 
+// add reatime notification kind of thing to send it in one way for real time game updates and all like you  
+// have game like that join or exit  
