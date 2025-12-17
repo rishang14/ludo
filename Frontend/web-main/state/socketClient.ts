@@ -1,11 +1,10 @@
 import { create } from "zustand";
 import { useGameStore } from "./gameStore";
-import { redirectUserTohomeWithToast } from "@/lib/ws.helper";
+import {
+  redirectUserTohomeWithToast,
+  userJoinedBroadCast,
+} from "@/lib/ws.helper";
 
-type JoinedUser = {
-  gameId: string;
-  userId: string;
-};
 interface SocketType {
   socket: WebSocket | null;
   isConnected: boolean;
@@ -79,10 +78,10 @@ export const useSocket = create<SocketType>()((set, get) => ({
         break;
 
       case "user_Exited":
-        {
-          redirectUserTohomeWithToast(payload.data as string);
-        }
+        redirectUserTohomeWithToast(payload.data as string);
         break;
+      case "user_Joined":
+        userJoinedBroadCast(payload.data);
       default:
         break;
     }

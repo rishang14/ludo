@@ -1,6 +1,7 @@
 import { WebSocketServer } from "ws";
 import { RoomManager } from "./roomManager";
 import { GameManager } from "../game/gameManager";
+import { UserRepo } from "../../repositry/user.repositry";
 
 export class RealTime {
   public wss: WebSocketServer;
@@ -41,7 +42,8 @@ export class RealTime {
           `game:${msg.payload.gameId}`,
           `user:${msg.payload.userId}`,
           socket
-        );
+        );  
+        const userName= await UserRepo.getUserById(msg.payload.userId)
         const wholeBoard = await GameManager.getWholeGameState(
           msg.payload.gameId
         );
@@ -53,7 +55,7 @@ export class RealTime {
         );
         this.room.broadcastInRoom(`game:${msg.payload.gameId}`, {
           type: "user_Joined",
-          id: msg.payload.userId,
+          data:  userName,
         });
         break;
       case "roll_Dice":

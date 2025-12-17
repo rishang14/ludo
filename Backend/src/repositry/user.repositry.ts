@@ -9,6 +9,15 @@ export class UserRepo {
     }
     return user;
   }
+ 
+ public static async getUserById(userId:string){
+  const user= await prisma.user.findFirst({where:{id:userId}}); 
+  if(!user){
+    return; 
+  } 
+  return user.name;
+ }
+  
 
   public static async updateUserData(
     userId: string,
