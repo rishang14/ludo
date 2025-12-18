@@ -1,45 +1,67 @@
-Video demo  :[link](https://www.linkedin.com/feed/update/urn:li:activity:7407095633913839616/)  
-                :[link2 ](https://x.com/rishang_14/status/2001567119595708862)   
-                 : [link3](https://www.linkedin.com/feed/update/urn:li:ugcPost:7407339302994706432/)  
-  :[link4](https://x.com/rishang_14/status/2001577417958396350)
+<!-- ================= IMAGES ================= -->
+<p align="center">
+  <img src="./assets/create.png" width="250" />
+  <img src="./assets/join-game.png" width="250" />
+  <img src="./assets/wholeludo.png" width="250" />
+</p>
 
+<hr/>
 
-Note: All of these code every single line of logic and architecture is written by me without help of any ai tools cuz i don't use it 
+<h2>🎮 Real-Time Multiplayer Ludo Game</h2>
 
-Ps: i am not gonna tell you about the ui portion 🫡🫡
+<p>
+A fully server-authoritative, real-time multiplayer Ludo game built from scratch with a
+custom game engine, WebSocket networking, and Redis-backed state management.
+</p>
 
-I built a real-time multiplayer Ludo game with custom game engine, WebSocket networking, Redis-based state management, turn validation, pawn capture logic, and scalable room-based broadcasting, fully production-oriented. 
+<h3>🎥 Video Demos</h3>
+<ul>
+  <li><a href="https://www.linkedin.com/feed/update/urn:li:activity:7407095633913839616/">Video 1</a></li>
+  <li><a href="https://x.com/rishang_14/status/2001567119595708862">Video 2</a></li>
+  <li><a href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7407339302994706432/">Vidoe 3</a></li>
+  <li><a href="https://x.com/rishang_14/status/2001577417958396350">video 4</a></li>
+</ul>
 
-Feature : 
+<hr/>
 
- 1.Designed a complete Ludo game engine with turn-based rules, dice logic, and move validation 
- 
- 2.implemented real-time multiplayer sync using WebSockets with game-room isolation
- 
- 3. Built server-authoritative gameplay to prevent cheating and invalid moves
-  Modeled board state & pawn state using optimized maps for O(1) lookups
- 
- 4. Implemented pawn capture, safe cells, home & finish logic correctly
+<h3>🧠 Core Highlights</h3>
+<ul>
+  <li>Designed a complete Ludo game engine with turn-based rules, dice logic, and move validation</li>
+  <li>Implemented real-time multiplayer sync using WebSockets with strict game-room isolation</li>
+  <li>Built server-authoritative gameplay to prevent cheating and invalid moves</li>
+  <li>Modeled board state and pawn state using optimized maps for O(1) lookups</li>
+  <li>Implemented pawn capture, safe cells, home logic, and finish rules accurately</li>
+  <li>Used Redis as a shared game-state store for fast reads and atomic updates</li>
+  <li>Designed secure join/exit flows with per-game and per-user access validation</li>
+  <li>Calculated movable pawns dynamically based on dice value and pawn state</li>
+  <li>Implemented turn locking, dice roll permissions, and move gating</li>
+  <li>Built a broadcast system to sync board updates to all players instantly</li>
+  <li>Structured backend with clear separation: Game Manager, WebSocket Gateway, Redis Layer</li>
+  <li>Built frontend using React + Zustand for deterministic state updates</li>
+  <li>Maintained stateless HTTP APIs alongside stateful WebSocket connections</li>
+</ul>
 
-5. Used Redis as a shared game state store for fast reads and updates
+<hr/>
 
-6. Designed join/exit flow with access validation per game & user
+<h3>🛠️ Notes</h3>
+<p>
+Every line of logic, architecture, and game rules was written manually without using AI-generated code.
+UI details are intentionally omitted.
+</p>
 
-7. Implemented movable pawn calculation per turn based on dice value
+<hr/>
 
-8. Built turn locking, dice roll permissions, and move gating
+<h3>🚀 Current Focus</h3>
+<ul>
+  <li>Bot player logic</li>
+  <li>Match lifecycle management</li>
+  <li>Performance and edge-case polish</li>
+</ul>
 
-9. Added broadcast system to sync board updates to all players instantly
+<hr/>
 
-10. Structured backend with Game Manager, WebSocket Gateway, and Redis Layer
-
-11. Built frontend using React + Zustand for deterministic state updates
-
-12. Ensured stateless HTTP + stateful WebSocket architecture
-
-
-
- 🚀 Currently focused on polish, bot player logic, and match lifecycle improvements. 
-🚀 Currently focused on polish, bot player logic, and match lifecycle improvements. 
-
-Am i hirable now ?????? 
+<h2>❓ Am I Hireable?</h2>
+<p>
+If you’re hiring for backend-heavy, real-time, WebSocket-driven systems — yes.
+This project demonstrates system design, state management, networking, and production-oriented thinking.
+</p>

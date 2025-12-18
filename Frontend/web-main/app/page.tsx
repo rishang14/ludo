@@ -43,7 +43,7 @@ export default async function Page() {
         </div>
         <div className="flex gap-2  flex-wrap justify-center items-center">
           <PlaywithfriendCard  userId={data.id}/>
-          <PlaywithCompCard />
+          {/* <PlaywithCompCard /> */}
         </div>
       </div>
     </div>
