@@ -35,15 +35,15 @@ export class GameRepo {
   }
 
   public static async getGame(gameId: string): Promise<Game> { 
-    const game = await prisma.game.findFirstOrThrow({
+    const game = await prisma.game.findFirst({
       where: {
         id: gameId,
       },
     }); 
-    if (!gameId) {
+    if (!game) {
       throw new Error("Game Not Found");
     }
-    return game;
+    return game as Game;
   }
 
   public static async deleteGame(gameId: string): Promise<Game> {

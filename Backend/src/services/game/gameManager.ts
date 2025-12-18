@@ -19,17 +19,13 @@ import { UserRepo } from "../../repositry/user.repositry";
 import { wss } from "../..";
 
 export class GameManager{
-  public static totalPlayer: number = 0;
-  private static turns: Set<string> = new Set();
-  private static userIdWithColor: Map<string, string> = new Map();
-
   public static async initBoard(totlPlayerIds: string[], gameId: string) {
     //game pawn
     if (!totlPlayerIds.length || !gameId) {
       throw new Error("GameIds with totalPlayerIds are required");
-    }
-    this.totalPlayer = totlPlayerIds.length;
-    for (let i = 0; i < totlPlayerIds.length; i++) {
+    } 
+    await RedisInstance.setUsers(gameId,totlPlayerIds);
+    for (let i = 0; i < totlPlayerIds.length; i++){
       for (const p of dirstributePawn[i]!) {
         if (totlPlayerIds[i]) {
           const userwithColor= await RedisInstance.getUserWithColor(gameId,totlPlayerIds[i] as string) 
@@ -37,7 +33,6 @@ export class GameManager{
             await RedisInstance.setUserWithColor(gameId,totlPlayerIds[i] as string, mapColor[p.charAt(0)] as colors )
           } 
         }
-        this.turns.add(totlPlayerIds[i]!);
         const pawn: pawn = {
           pId: p,
           position: p,
@@ -133,8 +128,8 @@ export class GameManager{
     return Math.floor(Math.random() * 6) + 1;
   }
 
-  private static calcNextTurn(userId: string) {
-    const turns = [...this.turns];
+  private static async calcNextTurn(userId: string,gameId:string) {
+    const turns = await RedisInstance.getTotalUser(gameId) 
     const idx = turns.indexOf(userId);
     const totalLength = turns.length;
     const newIdx = idx + 1 >= totalLength ? 0 : idx + 1;
@@ -150,7 +145,7 @@ export class GameManager{
     canDiceMove: boolean,
     canPawnMove: boolean
   ) {
-    const turn = this.calcNextTurn(userId);  
+    const turn =await this.calcNextTurn(userId,gameId);  
     console.log(turn,"turn"); 
     console.log(currentUserTurn,"current user TURN") 
     console.log("userId", userId)

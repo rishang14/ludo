@@ -1,4 +1,5 @@
 import { globalSafePlace } from "@/lib/constant";
+import { sendPawnMoveToServer } from "@/lib/ws.helper";
 import { create } from "zustand";
 
 type colors = "Red" | "Blue" | "Green" | "Yellow";
@@ -12,7 +13,9 @@ export type pawn = {
 };
 
 interface gameBoard {
-  pawnMap: Map<string, pawn>;
+  pawnMap: Map<string, pawn>; 
+  gameId:string, 
+  userId:string,
   boardMap: Map<string, Set<string>>;
   currentTurn: string;
   currentUserTurn: string;
@@ -20,9 +23,13 @@ interface gameBoard {
   winnerFound:boolean,  
   winnerName:string, 
   winnerColor:string, 
-  setWinnerFound:(winnerName:string,winnerColor:string)=>void
   canPawnMove: boolean;
   winnerOrders: string[];
+  diceVal: number;
+  movablePawn: Set<string>;
+  safePlace: Set<string>; 
+  setGameAndUser:(gameId:string ,userId:string)=> void
+  setWinnerFound:(winnerName:string,winnerColor:string)=>void
   updateBackbone: (gState: any) => void;
   updateBoard: (
     pId: string,
@@ -38,10 +45,7 @@ interface gameBoard {
     newpos?: string
   ) => void;
   updateBoardState: (pId: string, oldPos: string, newPos: string) => void;
-  movablePawn: Set<string>;
   initGameBoard: (pawnMap: any, globalBoard: any, gameState: any) => void;
-  diceVal: number;
-  safePlace: Set<string>;
 }
 
 export const useGameStore = create<gameBoard>()((set, get) => ({
@@ -52,7 +56,9 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
   canPawnMove: false, 
   winnerFound:false, 
   winnerColor:"", 
-  winnerName:"",
+  winnerName:"", 
+  gameId:"", 
+  userId:"",
   winnerOrders: [],
   diceVal: 1,
   currentUserTurn: "",
@@ -62,6 +68,10 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
 
   setWinnerFound:(winnerName,winnerColor)=>{
     set({winnerFound:true , winnerColor,winnerName})
+  }, 
+
+  setGameAndUser:(gameId,userId)=>{
+    set({gameId,userId})
   },
 
   initGameBoard: (pMap, gMap, gState) => {
@@ -115,7 +125,13 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
 
   updateBackbone: (gState: any) => {
     for (const [key, value] of Object.entries(gState)) {
-      if (key === "movablePawns") {
+      if (key === "movablePawns") {  
+        // @ts-ignore
+        if( value.length === 1 && get().currentUserTurn ===get().userId){ 
+          console.log("i am inside the auto move") 
+          // @ts-ignore
+          sendPawnMoveToServer(get().gameId,get().userId,value[0])
+        }
         set({ movablePawn: new Set(value as any) });
         continue;
       }

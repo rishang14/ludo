@@ -1,8 +1,6 @@
 "use client";
-
+import { sendPawnMoveToServer } from "@/lib/ws.helper";
 import { useGameStore } from "@/state/gameStore";
-import { useSocket } from "@/state/socketClient";
-import { usePathname } from "next/navigation";
 import {  useRef } from "react";
 
 interface PawnSVGProps {
@@ -19,11 +17,7 @@ export const Pawn = ({
   isFinished
 }: PawnSVGProps) => {
   const pawnRef = useRef<HTMLElement | null>(null);
-  const { currentUserTurn, canPawnMove,movablePawn } = useGameStore();  
-  const pathname= usePathname();   
-  const userId=pathname.split('/')[4]; 
-  const gameId=pathname.split('/')[2]; 
-  const {sendToServer}=useSocket()
+  const { currentUserTurn, canPawnMove,movablePawn,gameId,userId } = useGameStore();  
   const pawncolor: Record<string, any> = {
     Blue: "#93c5fd",
     Red: "#fb7185",
@@ -40,7 +34,7 @@ export const Pawn = ({
         if(!userId || !gameId) return;
         if (canPawnMove  && movablePawn.has(id)) {  
           if(currentUserTurn ===userId){
-            sendToServer("pawn_Clicked",{gameId,userId,pId:id})
+          sendPawnMoveToServer(gameId,userId,id)
            console.log(" i am send")
           }
         }

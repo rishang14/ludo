@@ -29,7 +29,7 @@ type LudoProp = {
 };
 
 const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
-  const { winnerFound, diceVal, currentUserTurn } = useGameStore();
+  const { winnerFound, diceVal, currentUserTurn, setGameAndUser } = useGameStore();
   const { connectToSocket, disconnectSocket, sendToServer, isConnected } =
     useSocket();
 
@@ -40,7 +40,8 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
   }, []);
 
   useEffect(() => {
-    if (!gameId || !userId) return;
+    if (!gameId || !userId) return; 
+    setGameAndUser(gameId,userId);
     if (isConnected) {
       sendToServer("join_User", { gameId, userId });
     }

@@ -16,7 +16,11 @@ export class RedisInstance {
   } 
   private static userWithColorKey(gameId:string){
     return `${gameId}:userWithKey`  
-  } 
+  }  
+
+  private static getTotalUserKey(gameId:string){
+    return `${gameId}:totalUser`;
+  }
 
   public static async initialize() {
     if (this.client) {
@@ -82,7 +86,27 @@ export class RedisInstance {
     console.log("error while getting up userwith color",error)
    }
   }  
+ 
+  public static async  setUsers(gameId:string,val:string[]){
+   if(!this.client){
+    throw new Error("Redis is not connected");  
+   } 
+   const key = this.getTotalUserKey(gameId); 
 
+   const totalUser= await this.client.HSET(key,"totalUser",JSON.stringify(val))    
+  }    
+
+  public static async getTotalUser(gameId:string){
+    if(!this.client){
+      throw new Error("Redis is not connected")  
+    }  
+    const key = this.getTotalUserKey(gameId); 
+    const totalUser= await this.client.HGET(key,"totalUser");  
+    if(!totalUser){
+      throw new Error("Either gameId is wrong ")
+    }
+    return JSON.parse(totalUser)
+  }
 
   public static async getAllPawn(gameId: string) {
     if (!this.client) {
