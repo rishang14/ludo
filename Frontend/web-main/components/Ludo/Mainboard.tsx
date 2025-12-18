@@ -46,7 +46,6 @@ const Ludo: React.FC<LudoProp> = ({ gameId, userId }) => {
       sendToServer("join_User", { gameId, userId });
     }
   }, [isConnected, gameId, userId]); 
-  console.log(userId,"userId in main board")
     return ( 
       <>
     <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
