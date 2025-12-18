@@ -68,10 +68,11 @@ export const useSocket = create<SocketType>()((set, get) => ({
         useGameStore.getState().updateBackbone(payload.data.backbone);
         break;
       case "move_Pawn":
-        useGameStore.getState().updateBackbone(payload.data.backbone);
-        console.log("data: ", payload.data);
+        if (payload.data.backbone) {
+          useGameStore.getState().updateBackbone(payload.data.backbone);
+        }
         const { pawnId, pawnNewPos, pawnWon, capturedPawn } = payload.data;
-        const captured = capturedPawn.length > 0;
+        const captured = capturedPawn.length > 0; 
         useGameStore
           .getState()
           .updateBoard(pawnId, captured, capturedPawn, pawnNewPos, pawnWon);
@@ -81,13 +82,13 @@ export const useSocket = create<SocketType>()((set, get) => ({
         redirectUserTohomeWithToast(payload.data as string);
         break;
       case "user_Joined":
-        userJoinedBroadCast(payload.data);  
-        break; 
-      case "winner_Found": 
-         console.log(payload,"payload")   
-         const {winnerName,winnerColor}= payload.data
-         useGameStore.getState().setWinnerFound(winnerName,winnerColor); 
-         break;
+        userJoinedBroadCast(payload.data);
+        break;
+      case "winner_Found":
+        console.log(payload, "payload");
+        const { winnerName, winnerColor } = payload.data;
+        useGameStore.getState().setWinnerFound(winnerName, winnerColor);
+        break;
       default:
         break;
     }
