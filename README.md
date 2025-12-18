@@ -1,6 +1,7 @@
 Video demo  :[link](https://www.linkedin.com/feed/update/urn:li:activity:7407095633913839616/)  
                 :[link2 ](https://x.com/rishang_14/status/2001567119595708862)   
-                 : [link3](https://www.linkedin.com/feed/update/urn:li:ugcPost:7407339302994706432/)
+                 : [link3](https://www.linkedin.com/feed/update/urn:li:ugcPost:7407339302994706432/)  
+  :[link4](https://x.com/rishang_14/status/2001577417958396350)
 
 
 Note: All of these code every single line of logic and architecture is written by me without help of any ai tools cuz i don't use it 
