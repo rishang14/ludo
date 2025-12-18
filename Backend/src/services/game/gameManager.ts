@@ -323,7 +323,12 @@ export class GameManager{
           winnerColor: currPawn.color, 
           userId:userId, 
           winnerName:getUser?.name, 
-          gameId:gameId
+          gameId:gameId, 
+         pawnId: pId,
+         pawnNewPos: newPos,
+         pawnWon: pathAcheived,
+        capturedPawn: captured,
+        backbone: gameState,
         })   
         return;
       } 
