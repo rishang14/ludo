@@ -1,6 +1,6 @@
 import { createClient, type RedisClientType } from "redis";
 import { redisConfig } from "../../utils/redisConfig";
-import type { backBone, pawn, updatePawn } from "../../dto/game.dto";
+import type { backBone, gameInitType, pawn, updatePawn } from "../../dto/game.dto";
 
 export class RedisInstance {
   private static client: RedisClientType | null = null;
@@ -20,6 +20,10 @@ export class RedisInstance {
 
   private static getTotalUserKey(gameId:string){
     return `${gameId}:totalUser`;
+  }  
+
+  private static  getGameKey(gameId:string){
+    return `${gameId}:game`;
   }
 
   public static async initialize() {
@@ -46,12 +50,32 @@ export class RedisInstance {
 
     await this.client.connect();
   }
+  
+ public static async setGame(gameId:string,payload:gameInitType){
+     if (!this.client) {
+      throw new Error("Redis is not connected");
+    }  
+    const key=this.getGameKey(gameId); 
+    const details = await this.client.hSet(key,"gameDetails",JSON.stringify(payload)); 
+ }  
+
+ public static async getGame(gameId:string){
+  if(!this.client){
+    throw new Error("Redis is not connected"); 
+  } 
+  const key= this.getGameKey(gameId); 
+  const gameDetails=await this.client.hGet(key,"gameDetails"); 
+  if(!gameDetails){
+    return null
+  } 
+  return gameDetails;
+ }
 
   public static async getOnePawn(gameId: string, pId: string) {
-    const key = this.pawnKey(gameId);
     if (!this.client) {
       throw new Error("Redis is not connected");
-    }
+    } 
+    const key = this.pawnKey(gameId);
     const pawn = await this.client.hGet(key, pId);
     if (!pawn) {
       throw new Error("Invalid gameId or pawnId");
@@ -87,13 +111,13 @@ export class RedisInstance {
    }
   }  
  
-  public static async  setUsers(gameId:string,val:string[]){
+  public static async  setUsers(gameId:string,val:string){
    if(!this.client){
     throw new Error("Redis is not connected");  
    } 
    const key = this.getTotalUserKey(gameId); 
 
-   const totalUser= await this.client.HSET(key,"totalUser",JSON.stringify(val))    
+   const totalUser= await this.client.SADD(key,val)    
   }    
 
   public static async getTotalUser(gameId:string){
@@ -101,11 +125,11 @@ export class RedisInstance {
       throw new Error("Redis is not connected")  
     }  
     const key = this.getTotalUserKey(gameId); 
-    const totalUser= await this.client.HGET(key,"totalUser");  
+    const totalUser= await this.client.SCAN(key);  
     if(!totalUser){
       throw new Error("Either gameId is wrong ")
     }
-    return JSON.parse(totalUser)
+    return totalUser.keys
   }
 
   public static async getAllPawn(gameId: string) {

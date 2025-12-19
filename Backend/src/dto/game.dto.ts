@@ -11,18 +11,6 @@ export const initGameSchema = z
       .refine((val) => [2, 3, 4].includes(val), {
         message: "Total players must be 2, 3, or 4",
       }),
-
-    emails: z
-      .array(z.email({ error: "Invalid email format" }))
-      .nonempty("Emails array cannot be empty")
-      .max(3, { message: "Cannot provide more than 3 emails" })
-      .refine((arr) => new Set(arr).size === arr.length, {
-        message: "Duplicate emails are not allowed",
-      }),
-  })
-  .refine((data) => data.emails.length === data.totalPlayers-1, {
-    message: "Emails should be only of invited player",
-    path: ["emails"],
   });
 
 export const validId = z.cuid({ error: "Invlalid Cuid" });
@@ -76,4 +64,10 @@ export type calcMoveReturn = {
 export  type capturedReturnType={
   captruedSuccess:boolean, 
   capturedPawn:string|null
+} 
+
+export type gameInitType={
+  gameId:string ,
+  totalPlayer:string,
+  currentUser:string
 }

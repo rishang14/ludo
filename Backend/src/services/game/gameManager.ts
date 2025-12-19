@@ -24,7 +24,6 @@ export class GameManager{
     if (!totlPlayerIds.length || !gameId) {
       throw new Error("GameIds with totalPlayerIds are required");
     } 
-    await RedisInstance.setUsers(gameId,totlPlayerIds);
     for (let i = 0; i < totlPlayerIds.length; i++){
       for (const p of dirstributePawn[i]!) {
         if (totlPlayerIds[i]) {
