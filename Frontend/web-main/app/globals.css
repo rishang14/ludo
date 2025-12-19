@@ -10,10 +10,8 @@ body{
 
 #ludoBoard {
   display: grid;
-  min-width: 500px;  
-  max-width: 520px; 
-  max-height: 520px;
-  min-height: 500px;
+  width: clamp(320px, 80vw, 520px);
+  aspect-ratio: 1 / 1;
   background: white;
 
   grid-template-columns: repeat(5, 1fr);

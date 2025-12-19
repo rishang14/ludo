@@ -65,10 +65,6 @@ export class RealTime {
         }
         const { success, sendGameStatus, error, sendWaiting } =
           await GameManager.handleGameJoin(gameId, userId); 
-
-          console.log("success",success);  
-          console.log("gamestatus",sendGameStatus); 
-          console.log("tell hime to wait",sendWaiting)
          if (!success) {
           socket.send(
             JSON.stringify({

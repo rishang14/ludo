@@ -383,13 +383,8 @@ export const pathToWin: Record<colors, string[]> = {
 
 
 
-//Todos  
-// here remaining for the backend  
-// add winning order and  chat system 
-// make the user exit from the room if any one left kill that room  
-// build the bot   
+// Todos 
 
-//for frontend 
-// if pawn is single move on to thier own 
-// add reatime notification kind of thing to send it in one way for real time game updates and all like you  
-// have game like that join or exit  
+// implememt the 4 player winner cycle how to do that figure it out how  you will do that 
+// dockerize the application  that'st 
+// deploy it on gcp   
