@@ -2,7 +2,8 @@ import express from "express";
 import type { NextFunction, Request, Response } from "express";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import cors from "cors";
-import http from "http";
+import http from "http"; 
+import cookieParser from "cookie-parser"
 import { auth } from "./lib/auth";
 import { RealTime } from "./services/ws/realTime";
 import { RedisInstance } from "./services/redis/redisClient";
@@ -22,7 +23,8 @@ app.use(
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.use(express.json());
+app.use(express.json()); 
+app.use(cookieParser());
 try {
   await RedisInstance.initialize();
 } catch (error: any) {

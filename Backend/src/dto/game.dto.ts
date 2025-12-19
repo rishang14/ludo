@@ -68,6 +68,5 @@ export  type capturedReturnType={
 
 export type gameInitType={
   gameId:string ,
-  totalPlayer:string,
-  currentUser:string
+  totalPlayers:string,
 }
