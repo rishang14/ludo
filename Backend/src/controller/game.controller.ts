@@ -49,7 +49,8 @@ export const initGame = async (req: Request, res: Response) => {
       gameId: createdGameId,
       totalPlayers: totalPlayers.toString(),
     };
-    await RedisInstance.setGame(createdGameId, payload);
+    await RedisInstance.setGame(createdGameId, payload); 
+    await RedisInstance.setGameInIt(createdGameId,false);
     return res
       .status(201)
       .json(

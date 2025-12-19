@@ -58,7 +58,7 @@ export const useSocket = create<SocketType>()((set, get) => ({
   },
   handleMessage: (payload: any) => {
     switch (payload.type) {
-      case "game_status":
+      case "game_Status":
         const { pawnMap, gameBackbone, globaLBoardMap } = payload.data;
         useGameStore
           .getState()

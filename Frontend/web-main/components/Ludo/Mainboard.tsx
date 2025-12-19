@@ -81,7 +81,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
     }
   }, [isConnected, gameId, userId]);
    if(!gameStarted){
-    <LudoWaitingDialog/>
+   return <LudoWaitingDialog/>
    }
   return (
     <>   

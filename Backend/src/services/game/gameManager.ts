@@ -17,11 +17,13 @@ import { calcMove } from "../../lib/helper";
 import { GameRepo } from "../../repositry/game.repositry";
 import { UserRepo } from "../../repositry/user.repositry";
 import { wss } from "../..";
+import { success } from "zod";
+import { fa } from "zod/locales";
 
 export class GameManager {
-  public static async initBoard(totlPlayerIds: string[], gameId: string) { 
-    console.log(totlPlayerIds,"totalplayer ids") 
-    console.log(gameId,"gameid")
+  public static async initBoard(totlPlayerIds: string[], gameId: string) {
+    // console.log(totlPlayerIds,"totalplayer ids")
+    // console.log(gameId,"gameid")
     if (!totlPlayerIds.length || !gameId) {
       throw new Error("GameIds with totalPlayerIds are required");
     }
@@ -81,6 +83,55 @@ export class GameManager {
     }
   }
 
+  public static async handleGameJoin(
+    gameId: string,
+    userId: string
+  ): Promise<{
+    success: boolean;
+    error?: string;
+    sendGameStatus: boolean;
+    sendWaiting: boolean;
+  }> {
+    const gameStatus = await this.getGame(gameId);
+    let totalplayers = Number(JSON.parse(gameStatus.totalPlayers));
+    const joinedbefore = await this.getTotalJoinedUsers(gameId);
+   const userExists= await RedisInstance.alreadyInJoinedUser(gameId,userId); 
+
+   if(!userExists){
+     if (joinedbefore && joinedbefore?.length >= totalplayers) {
+       return {
+         success: false,
+         error: "Game is full",
+         sendGameStatus: false,
+         sendWaiting: true,
+       };
+   }
+    }
+  const userJoined = await this.addUserToGame(gameId, userId);
+    const updatedLength = await this.getTotalJoinedUsers(gameId);
+     console.log("length after user added",updatedLength)
+    if (totalplayers === updatedLength?.length) {
+      const gameInitStatus = await RedisInstance.getInitGameStatus(gameId);
+      if (!gameInitStatus && updatedLength) { 
+        console.log("game is init first time")
+        await RedisInstance.setGameInIt(gameId, true);
+        await this.initBoard(updatedLength, gameId);
+      } 
+      console.log("Returing from the total player equal to scenraio")
+      return {
+        success: true,
+        sendGameStatus: true,
+        sendWaiting: false,
+      };
+    }
+   
+    return {
+      success: true,
+      sendGameStatus: false,
+      sendWaiting: true,
+    };
+  }
+
   public static async getWholeGameState(gameId: string) {
     if (!gameId) return;
     const pawns = await RedisInstance.getAllPawn(gameId);
@@ -134,7 +185,9 @@ export class GameManager {
   }
 
   private static async calcNextTurn(userId: string, gameId: string) {
-    const turns = await RedisInstance.getTotalUser(gameId);
+    const turns: string[] = (await RedisInstance.getJoinedUser(
+      gameId
+    )) as string[];
     const idx = turns.indexOf(userId);
     const totalLength = turns.length;
     const newIdx = idx + 1 >= totalLength ? 0 : idx + 1;
@@ -212,9 +265,9 @@ export class GameManager {
       backbone: newBackBone,
     };
   }
-  public static async getTotalUser(gameId: string) {
+  public static async getTotalJoinedUsers(gameId: string) {
     if (!gameId) return;
-    const totalUser = await RedisInstance.getTotalUser(gameId);
+    const totalUser = await RedisInstance.getJoinedUser(gameId);
     return totalUser;
   }
 
@@ -236,18 +289,14 @@ export class GameManager {
   }
   public static async getGame(gameId: string) {
     if (!gameId) return;
-    const gameDetails = await RedisInstance.getGame(gameId); 
-    if(!gameDetails) return null;
+    const gameDetails = await RedisInstance.getGame(gameId);
+    if (!gameDetails) return null;
     return gameDetails;
   }
 
   public static async addUserToGame(gameId: string, userId: string) {
     if (!gameId || !userId) return;
-    const setuser = await RedisInstance.setUsers(gameId, userId);
-
-    const totalUser = await this.getTotalUser(gameId);
-
-    return totalUser;
+    const setuser = await RedisInstance.setJoinedUsers(gameId, userId);
   }
   private static async updateBoardVal(
     gameId: string,

@@ -52,49 +52,69 @@ export class RealTime {
     const userId = socket.playerId;
     switch (msg.type) {
       case "join_User":
-        this.room.joinRoom(`game:${gameId}`, `user:${userId}`, socket);
-        const getGame = await GameManager.getGame(gameId);
-        console.log(getGame, "game in the webscoket");
-        if (!getGame) return;
-        const totalPlayers = JSON.parse(getGame.totalPlayers as string);
-        const allUserWithTheNewOne = await GameManager.addUserToGame(
-          gameId,
-          userId
-        ); 
-        console.log(totalPlayers,"length of totalUser"); 
-        console.log(allUserWithTheNewOne,"added the new one also");
-        if (allUserWithTheNewOne?.length === +totalPlayers){
-          // const game =   await GameManager.initBoard(allUserWithTheNewOne, gameId); 
-          // console.log(game,"game in the real time")
-          const wholeBoard = await GameManager.getWholeGameState(gameId); 
-          console.log(wholeBoard,"board") 
-          this.room.broadcastInRoom(`game:${gameId}`,{
-          type:"waiting", 
-          data:{
-            gameStarted:true, 
-            totalPlayers:+totalPlayers, 
-            joinedPlayers:allUserWithTheNewOne?.length ?? 0
-          } })
+        const gameDetails = await GameManager.getGame(gameId);
+        if (!gameDetails) {
           socket.send(
             JSON.stringify({
-              type: "game_status",
-              data: wholeBoard,
+              type: "error",
+              error: "game  not found",
             })
-          ); 
-        }else{ 
-          this.room.broadcastInRoom(`game:${gameId}`,{
-          type:"waiting", 
-          data:{
-            gameStarted:false, 
-            totalPlayers:+totalPlayers, 
-            joinedPlayers:allUserWithTheNewOne?.length ?? 0
-          }
-        })
+          );
+          socket.close();
+          return;
+        }
+        const { success, sendGameStatus, error, sendWaiting } =
+          await GameManager.handleGameJoin(gameId, userId); 
+
+          console.log("success",success);  
+          console.log("gamestatus",sendGameStatus); 
+          console.log("tell hime to wait",sendWaiting)
+         if (!success) {
+          socket.send(
+            JSON.stringify({
+              type: "error",
+              error,
+            })
+          );
+          socket.close();
+        }
+        this.room.joinRoom(`game:${gameId}`, `user:${userId}`, socket);
+        const totalPlayers = Number(
+          JSON.parse(gameDetails.totalPlayers as string)
+        );
+        const joinedPlayers = await GameManager.getTotalJoinedUsers(gameId);
+
+        if (sendGameStatus) {
+          const wholeBoard = await GameManager.getWholeGameState(gameId);
+          this.room.broadcastInRoom(`game:${gameId}`, {
+            type: "game_Status",
+            data: wholeBoard,
+          });
+        }
+
+        if (!sendGameStatus && sendWaiting) {
+          this.room.broadcastInRoom(`game:${gameId}`, {
+            type: "waiting",
+            data: {
+              gameStarted: false,
+              totalPlayers: totalPlayers,
+              joinedPlayers: joinedPlayers?.length ?? 0,
+            },
+          });
+        } else if (sendGameStatus && !sendWaiting) {
+          this.room.broadcastInRoom(`game:${gameId}`, {
+            type: "waiting",
+            data: {
+              gameStarted: true,
+              totalPlayers: totalPlayers,
+              joinedPlayers: joinedPlayers?.length ?? 0,
+            },
+          });
         }
         this.room.broadcastInRoom(`game:${gameId}`, {
           type: "user_Joined",
           data: userId,
-        }); 
+        });
         break;
       case "roll_Dice":
         console.log("roll dice val", msg);
