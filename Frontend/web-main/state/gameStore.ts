@@ -14,6 +14,9 @@ export type pawn = {
 
 interface gameBoard {
   pawnMap: Map<string, pawn>; 
+  gameStarted:boolean, 
+  joinedPlayers:number, 
+  totalPlayers:number,
   gameId:string, 
   userId:string,
   boardMap: Map<string, Set<string>>;
@@ -27,7 +30,8 @@ interface gameBoard {
   winnerOrders: string[];
   diceVal: number;
   movablePawn: Set<string>;
-  safePlace: Set<string>; 
+  safePlace: Set<string>;  
+  updateGameStart:(gameStarted:boolean,joinedPlayers:number,totalplayers:number)=>void
   setGameAndUser:(gameId:string ,userId:string)=> void
   setWinnerFound:(winnerName:string,winnerColor:string)=>void
   updateBackbone: (gState: any) => void;
@@ -49,9 +53,12 @@ interface gameBoard {
 }
 
 export const useGameStore = create<gameBoard>()((set, get) => ({
-  pawnMap: new Map(),
+  pawnMap: new Map(), 
+  gameStarted:false,
   boardMap: new Map(),
-  safePlace: new Set(globalSafePlace),
+  safePlace: new Set(globalSafePlace), 
+  joinedPlayers:0,
+  totalPlayers:0,
   canDiceRoll: true,
   canPawnMove: false, 
   winnerFound:false, 
@@ -64,7 +71,11 @@ export const useGameStore = create<gameBoard>()((set, get) => ({
   currentUserTurn: "",
   currentTurn: "Red",
   movablePawn: new Set(), 
+   
 
+  updateGameStart:(gameStarted,joinedPlayers,totalPlayers)=>{
+   set({gameStarted,joinedPlayers,totalPlayers})
+  },
 
   setWinnerFound:(winnerName,winnerColor)=>{
     set({winnerFound:true , winnerColor,winnerName})

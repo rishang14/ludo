@@ -15,7 +15,7 @@ export class RedisInstance {
     return `${gameId}:state`;
   } 
   private static userWithColorKey(gameId:string){
-    return `${gameId}:userWithKey`  
+    return `${gameId}:userWithColorKey`  
   }  
 
   private static getTotalUserKey(gameId:string){
@@ -64,11 +64,11 @@ export class RedisInstance {
     throw new Error("Redis is not connected"); 
   } 
   const key= this.getGameKey(gameId); 
-  const gameDetails=await this.client.hGet(key,"gameDetails"); 
+  const gameDetails=await this.client.HGET(key,"gameDetails"); 
   if(!gameDetails){
-    return null
+     throw new Error("game not found")
   } 
-  return gameDetails;
+  return JSON.parse(gameDetails);
  }
 
   public static async getOnePawn(gameId: string, pId: string) {
@@ -95,7 +95,8 @@ export class RedisInstance {
     }
     }  
 
-      public static async getUserWithColor(gameId:string,userId:string){
+      public static async getUserWithColor(gameId:string,userId:string){ 
+        console.log("user with color", userId)
     const key = this.userWithColorKey(gameId); 
     if(!this.client){
       throw new Error("Redis is not connected")
@@ -125,11 +126,11 @@ export class RedisInstance {
       throw new Error("Redis is not connected")  
     }  
     const key = this.getTotalUserKey(gameId); 
-    const totalUser= await this.client.SCAN(key);  
+    const totalUser= await this.client.SMEMBERS(key);  
     if(!totalUser){
       throw new Error("Either gameId is wrong ")
     }
-    return totalUser.keys
+    return totalUser;
   }
 
   public static async getAllPawn(gameId: string) {

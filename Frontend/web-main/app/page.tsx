@@ -7,18 +7,17 @@ import { User } from "better-auth";
 import { Dice1, Dice6 } from "lucide-react";
 import { redirect } from "next/navigation";
 export default async function Page() {
-  const data: User = await getSession();
-  if (!data) {
-    return redirect("/login");
-  }
+  // const data: User = await getSession();
+  // if (!data) {
+  //   return redirect("/login");
+  // }
   const gameDetected = await getOngoingGame(); 
   console.log("game",gameDetected);
-  if (gameDetected.data) {
+  if (gameDetected  && gameDetected.data) {
     return (
       <ActiveGameDetectModal
         isOpen={true}
         gameId={gameDetected.data}
-        userId={data.id}
       />
     );
   }
@@ -42,7 +41,7 @@ export default async function Page() {
           <Logoutbutton />
         </div>
         <div className="flex gap-2  flex-wrap justify-center items-center">
-          <PlaywithfriendCard  userId={data.id}/>
+          <PlaywithfriendCard  userId={""}/>
           {/* <PlaywithCompCard /> */}
         </div>
       </div>

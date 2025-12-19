@@ -45,15 +45,17 @@ export  const exitOrCancelGame=async(gameId:string)=>{
   }
 }  
 
-export const getGameUserDetails= async(gameId:string,userId:string)=>{
-  try {
-    const  val= await fetch(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/${gameId}/user/${userId}`,{
-      method:"POST",
-      headers:await headers()
-    })  
-    const res=await val.json() 
-    return res; 
-  } catch (error) {
-    console.log(error);
-  }
-}
+// export const getGameUserDetails= async(gameId:string)=>{
+//   try {
+//     const  val= await fetch(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/${gameId}`,{
+//       method:"POST",  
+//       credentials:"include", 
+//       headers: await headers()
+//     })  
+//     const res=await val.json() 
+//     return res; 
+    
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }

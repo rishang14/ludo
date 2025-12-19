@@ -1,44 +1,56 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    "outDir": "/dist",
-
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "allowImportingTsExtensions": true,  
-    "allowSyntheticDefaultImports":true,
+    /* ========================
+       Build / Output
+    ======================== */
+    "outDir": "./dist",
     "noEmit": true,
-    // For nodejs:
-    "lib": ["esnext"],
-    // and npm install -D @types/node 
-    "module": "ESNext",
-    "moduleResolution": "node",
+
+    /* ========================
+       Language & Environment
+    ======================== */
     "target": "ES2023",
+    "lib": ["ESNext"],
+
+    /* ========================
+       Module System (Node + ESM)
+    ======================== */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+
+    /* ========================
+       Type Checking (Strict)
+    ======================== */
     "strict": true,
-    // Other Outputs
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+
+    /* ========================
+       Declarations / Maps
+    ======================== */
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
 
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
+    /* ========================
+       JSX (safe to keep even for backend)
+    ======================== */
     "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
+
+    /* ========================
+       Safety / Performance
+    ======================== */
     "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    "skipLibCheck": true
+  },
+
+  /* ========================
+     Files to Include
+  ======================== */
+  "include": ["src", "src/types"]
 }

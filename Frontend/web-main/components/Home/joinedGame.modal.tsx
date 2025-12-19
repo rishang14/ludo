@@ -19,13 +19,13 @@ import { toast } from "sonner";
 interface GameModalProps {
   isOpen: boolean;
   gameId: string;
-  userId: string;
+  // userId: string;
 }
 
 export const ActiveGameDetectModal: React.FC<GameModalProps> = ({
   isOpen,
   gameId,
-  userId,
+  // userId,
 }) => {    
   const router=useRouter();
   const [loading,setLoading]=useState<boolean>(false)
@@ -64,7 +64,7 @@ try {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex-col gap-2 sm:flex-col sm:gap-2 mt-4">
-          <Link href={`game/${gameId}/user/${userId}`} prefetch={false}  >
+          <Link href={`game/${gameId}`} prefetch={false}  >
             <Button size="lg" className="w-full" disabled={loading}>
               Join the Game
             </Button>
@@ -73,7 +73,7 @@ try {
             variant="outline"
             size="lg"
             className="w-full bg-transparent"
-            onClick={exitgame} 
+            // onClick={exitgame} 
             disabled={loading}
           >
             Exit the Game

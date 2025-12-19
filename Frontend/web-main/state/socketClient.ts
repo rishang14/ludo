@@ -9,7 +9,7 @@ interface SocketType {
   socket: WebSocket | null;
   isConnected: boolean;
   connectToSocket: () => void;
-  sendToServer: (type: string, payload: any) => void;
+  sendToServer: (type: string, payload?: any) => void;
   disconnectSocket: () => void;
   handleMessage: (message: any) => void;
 }
@@ -87,7 +87,14 @@ export const useSocket = create<SocketType>()((set, get) => ({
       case "winner_Found":
         console.log(payload, "payload");
         const { winnerName, winnerColor } = payload.data;
-        useGameStore.getState().setWinnerFound(winnerName, winnerColor);
+        useGameStore.getState().setWinnerFound(winnerName, winnerColor); 
+        break; 
+        case"waiting":  
+        console.log(payload.data,"data for payload") 
+        console.log(payload.data.totalPlayers,"totalPlayers") 
+        console.log(payload.data.joinedPlayers)   
+        const {gameStarted,joinedPlayers,totalPlayers}= payload.data 
+         useGameStore.getState().updateGameStart(gameStarted,totalPlayers,joinedPlayers)
         break;
       default:
         break;

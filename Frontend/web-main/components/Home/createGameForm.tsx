@@ -26,24 +26,18 @@ export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOp
     setValue,
     formState: {errors,isSubmitting },
   } = useForm()
-  const totalPlayers = watch("totalPlayers")
 
   const onSubmit = async (data: any) => { 
-    let emails:string[]=[];
     try {
-      for(const [key,value] of Object.entries(data)){
-         if(key==="totalPlayers") continue; 
-         emails.push(value as string);
-      }   
       const createGame= await axios.post(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/creategame`,{
         totalPlayers:+data.totalPlayers, 
-        emails:emails
       },{withCredentials:true})    
       
       setDialogOpen(false);
-      if(createGame.data.success){
-        toast.success("Game created Successfully",{duration:3000,description:"Pls tell you friend to refresh home page"})  
-        router.push(`game/${createGame.data.data.id}/user/${userId}`);
+      if(createGame.data.success){    
+        let GameTitle= createGame.status ===201 ? "Game Created Successfully" : "Already in a Game"
+        toast.success(GameTitle,{duration:3000,description:createGame.data.message})  
+        router.push(`game/${createGame.data.data}`);
       } 
     } catch (error:any) {
       console.log(error,"error");
@@ -82,34 +76,6 @@ export const Creategameform: React.FC<dialogProp> = ({ isDialogOpen, setDialogOp
             />
             {errors.totalPlayers && <p className="text-sm text-destructive">{errors.totalPlayers.message as string}</p>}
           </div>
-
-          {totalPlayers && (
-            <div className="space-y-4">
-              {Array.from({ length: Number.parseInt(totalPlayers)-1  }, (_, index) => (
-                <div key={index} className="space-y-2">
-                  <Label htmlFor={`playerEmail${index + 1}`}>Player {index + 1} Email</Label>
-                  <Input
-                    id={`playerEmail${index + 1}`}
-                    type="email" 
-                    disabled={isSubmitting}
-                    placeholder={`player${index + 1}@example.com`}
-                    {...register(`playerEmail${index + 1}`, {
-                      required: `Player ${index + 1} email is required`,
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Invalid email address",
-                      },
-                    })}
-                    className={errors[`playerEmail${index + 1}`] ? "border-destructive" : ""}
-                  />
-                  {errors[`playerEmail${index + 1}`] && (
-                    <p className="text-sm text-destructive">{errors[`playerEmail${index + 1}`]?.message as string}</p>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-
           <div className="flex gap-3 pt-4">
             <Button
               type="button"

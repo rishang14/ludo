@@ -18,19 +18,27 @@ import { GameRepo } from "../../repositry/game.repositry";
 import { UserRepo } from "../../repositry/user.repositry";
 import { wss } from "../..";
 
-export class GameManager{
-  public static async initBoard(totlPlayerIds: string[], gameId: string) {
-    //game pawn
+export class GameManager {
+  public static async initBoard(totlPlayerIds: string[], gameId: string) { 
+    console.log(totlPlayerIds,"totalplayer ids") 
+    console.log(gameId,"gameid")
     if (!totlPlayerIds.length || !gameId) {
       throw new Error("GameIds with totalPlayerIds are required");
-    } 
-    for (let i = 0; i < totlPlayerIds.length; i++){
+    }
+    for (let i = 0; i < totlPlayerIds.length; i++) {
       for (const p of dirstributePawn[i]!) {
         if (totlPlayerIds[i]) {
-          const userwithColor= await RedisInstance.getUserWithColor(gameId,totlPlayerIds[i] as string) 
-          if(!userwithColor){
-            await RedisInstance.setUserWithColor(gameId,totlPlayerIds[i] as string, mapColor[p.charAt(0)] as colors )
-          } 
+          const userwithColor = await RedisInstance.getUserWithColor(
+            gameId,
+            totlPlayerIds[i] as string
+          );
+          if (!userwithColor) {
+            await RedisInstance.setUserWithColor(
+              gameId,
+              totlPlayerIds[i] as string,
+              mapColor[p.charAt(0)] as colors
+            );
+          }
         }
         const pawn: pawn = {
           pId: p,
@@ -50,7 +58,6 @@ export class GameManager{
         await RedisInstance.setBoard(gameId, c, [""]);
       }
     }
-  
 
     //gameStarterkit
     for (const p of gameStarterkit) {
@@ -62,13 +69,12 @@ export class GameManager{
         );
         return;
       }
-      if ((p.key as Partial<backBone>) === "currentTurn") { 
-         const color=await RedisInstance.getUserWithColor(gameId,totlPlayerIds[0]!);
-        await RedisInstance.updateBoardStateKey(
+      if ((p.key as Partial<backBone>) === "currentTurn") {
+        const color = await RedisInstance.getUserWithColor(
           gameId,
-          p.key,
-          color
+          totlPlayerIds[0]!
         );
+        await RedisInstance.updateBoardStateKey(gameId, p.key, color);
         return;
       }
       await RedisInstance.updateBoardStateKey(gameId, p.key, p.value);
@@ -87,7 +93,7 @@ export class GameManager{
     };
   }
 
-  private static async getTeamPawn(gameId: string, p: string){
+  private static async getTeamPawn(gameId: string, p: string) {
     const pawns: pawn[] = [];
 
     for (let i = 1; i <= 4; i++) {
@@ -113,9 +119,9 @@ export class GameManager{
         }
         continue;
       }
-      if (!p.isFinished) {  
-        const {newPos} =calcMove(pathToWin[p.color],p,diceVal); 
-        if(newPos !== p.position){
+      if (!p.isFinished) {
+        const { newPos } = calcMove(pathToWin[p.color], p, diceVal);
+        if (newPos !== p.position) {
           movablePawns.push(p.pId);
         }
       }
@@ -127,16 +133,16 @@ export class GameManager{
     return Math.floor(Math.random() * 6) + 1;
   }
 
-  private static async calcNextTurn(userId: string,gameId:string) {
-    const turns = await RedisInstance.getTotalUser(gameId) 
+  private static async calcNextTurn(userId: string, gameId: string) {
+    const turns = await RedisInstance.getTotalUser(gameId);
     const idx = turns.indexOf(userId);
     const totalLength = turns.length;
     const newIdx = idx + 1 >= totalLength ? 0 : idx + 1;
     return turns[newIdx];
   }
 
-  private static async NewBackBone( 
-    gameId:string,
+  private static async NewBackBone(
+    gameId: string,
     movablePawns: string[],
     diceVal: number,
     userId: string,
@@ -144,12 +150,20 @@ export class GameManager{
     canDiceMove: boolean,
     canPawnMove: boolean
   ) {
-    const turn =await this.calcNextTurn(userId,gameId);  
-    console.log(turn,"turn"); 
-    console.log(currentUserTurn,"current user TURN") 
-    console.log("userId", userId)
-        console.log(gameId,"gameId",currentUserTurn ? userId : turn!,"userid in the backbone  ") 
-   const color = await RedisInstance.getUserWithColor(gameId,currentUserTurn ? userId : turn!)
+    const turn = await this.calcNextTurn(userId, gameId);
+    console.log(turn, "turn");
+    console.log(currentUserTurn, "current user TURN");
+    console.log("userId", userId);
+    console.log(
+      gameId,
+      "gameId",
+      currentUserTurn ? userId : turn!,
+      "userid in the backbone  "
+    );
+    const color = await RedisInstance.getUserWithColor(
+      gameId,
+      currentUserTurn ? userId : turn!
+    );
     const val: Record<backBone, any> = {
       diceVal,
       canDiceRoll: canDiceMove,
@@ -158,30 +172,30 @@ export class GameManager{
       winnerOrders: [],
       currentUserTurn: currentUserTurn ? userId : turn!,
       movablePawns,
-    }; 
-    console.log("val for the backbone",val)
+    };
+    console.log("val for the backbone", val);
     return val;
   }
 
   public static async rollDice(gameId: string, userId: string) {
     const gameState = await RedisInstance.getGameStatus(gameId);
-  console.log("userId",userId,"gameId",gameId);
+    console.log("userId", userId, "gameId", gameId);
     if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
     const diceVal = this.generateDiceVal();
-    // console.log(this.userIdWithColor.forEach(t => console.log(t,"for user"))) 
-    console.log(gameId,"gameId",userId,"userid in the roll dice one ") 
-    const p = await RedisInstance.getUserWithColor(gameId,userId);
+    // console.log(this.userIdWithColor.forEach(t => console.log(t,"for user")))
+    console.log(gameId, "gameId", userId, "userid in the roll dice one ");
+    const p = await RedisInstance.getUserWithColor(gameId, userId);
     if (!p) throw new Error("UserId is Wrong");
     const movablePawns = await this.calcMovablePawn(
       gameId,
       p.charAt(0),
       diceVal
     );
-    console.log("before the movablae pawn in roll dice",movablePawns.length ); 
-    console.log("in roll dice one and code crashed here")
-    const newBackBone =await  this.NewBackBone( 
+    console.log("before the movablae pawn in roll dice", movablePawns.length);
+    console.log("in roll dice one and code crashed here");
+    const newBackBone = await this.NewBackBone(
       gameId,
       movablePawns,
       diceVal,
@@ -191,12 +205,17 @@ export class GameManager{
       movablePawns.length > 0
     );
     for (const [key, value] of Object.entries(newBackBone)) {
-      // console.log(key ,"value fo the backbone",value); 
+      // console.log(key ,"value fo the backbone",value);
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
     return {
       backbone: newBackBone,
     };
+  }
+  public static async getTotalUser(gameId: string) {
+    if (!gameId) return;
+    const totalUser = await RedisInstance.getTotalUser(gameId);
+    return totalUser;
   }
 
   private static async savePawnValue(
@@ -215,7 +234,21 @@ export class GameManager{
     };
     await RedisInstance.setPawn(gameId, newPawnVal);
   }
+  public static async getGame(gameId: string) {
+    if (!gameId) return;
+    const gameDetails = await RedisInstance.getGame(gameId); 
+    if(!gameDetails) return null;
+    return gameDetails;
+  }
 
+  public static async addUserToGame(gameId: string, userId: string) {
+    if (!gameId || !userId) return;
+    const setuser = await RedisInstance.setUsers(gameId, userId);
+
+    const totalUser = await this.getTotalUser(gameId);
+
+    return totalUser;
+  }
   private static async updateBoardVal(
     gameId: string,
     captured: boolean,
@@ -258,8 +291,8 @@ export class GameManager{
   }
 
   public static async movePawn(gameId: string, userId: string, pId: string) {
-    const gameState = await RedisInstance.getGameStatus(gameId); 
-    const gameDetails=await GameRepo.getGame(gameId); 
+    const gameState = await RedisInstance.getGameStatus(gameId);
+    const gameDetails = await GameManager.getGame(gameId);
     const movablePawns: string[] = JSON.parse(gameState.movablePawns!);
     const diceVal = JSON.parse(gameState.diceVal!);
     const color = JSON.parse(gameState.currentTurn!);
@@ -278,8 +311,8 @@ export class GameManager{
     );
     let captured: string = "";
     let nextTurn: boolean = false;
-    if (!globalSafePlace.has(newPos)  && !pathAcheived){ 
-      console.log("i entered in !pathachived one with the global safeplace")
+    if (!globalSafePlace.has(newPos) && !pathAcheived) {
+      console.log("i entered in !pathachived one with the global safeplace");
       const { capturedPawn, captruedSuccess } = await this.capturePawn(
         newPos,
         currPawn,
@@ -307,31 +340,31 @@ export class GameManager{
         nextTurn = true;
       }
     }
-    if (pathAcheived){   
-        await RedisInstance.updatePawnVlalue(gameId, currPawn.pId, {
+    if (pathAcheived) {
+      await RedisInstance.updatePawnVlalue(gameId, currPawn.pId, {
         ...currPawn,
         isFinished: true,
         isHome,
       });
-      const allpawn= await this.getTeamPawn(gameId,currPawn.pId.charAt(0))  
-      let totalFinishedPawn=allpawn.filter(i => i.isFinished === true);  
-      console.log("length of finished pawn",totalFinishedPawn)
-      if(totalFinishedPawn.length ===4){  
-        const getUser= await UserRepo.getUserById(userId)
-        wss.broadcastToUsers(gameId,"winner_Found",{ 
-          winnerColor: currPawn.color, 
-          userId:userId, 
-          winnerName:getUser?.name, 
-          gameId:gameId, 
-         pawnId: pId,
-         pawnNewPos: newPos,
-         pawnWon: pathAcheived,
-        capturedPawn: captured,
-        backbone: gameState,
-        })   
+      const allpawn = await this.getTeamPawn(gameId, currPawn.pId.charAt(0));
+      let totalFinishedPawn = allpawn.filter((i) => i.isFinished === true);
+      console.log("length of finished pawn", totalFinishedPawn);
+      if (totalFinishedPawn.length === 4) {
+        const getUser = await UserRepo.getUserById(userId);
+        wss.broadcastToUsers(gameId, "winner_Found", {
+          winnerColor: currPawn.color,
+          userId: userId,
+          winnerName: getUser?.name,
+          gameId: gameId,
+          pawnId: pId,
+          pawnNewPos: newPos,
+          pawnWon: pathAcheived,
+          capturedPawn: captured,
+          backbone: gameState,
+        });
         return;
-      } 
-         
+      }
+
       await this.updateBoardVal(gameId, true, pId, currPawn.position); //reomved from the global board
       nextTurn = true;
     }
@@ -339,13 +372,16 @@ export class GameManager{
       nextTurn = true;
     }
 
-    if(!pathAcheived){
-    await this.savePawnValue(gameId, false, pId, false, newPos); // saved for the normal value  like normal nothing happend
-    await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
-    await this.updateBoardVal(gameId, true, pId, currPawn.position); //dele from the old one
-    } 
-    console.log("before the click from the movepawn after the !pathacivedn",userId)
-    const newBackBone: Record<backBone, any> =await this.NewBackBone( 
+    if (!pathAcheived) {
+      await this.savePawnValue(gameId, false, pId, false, newPos); // saved for the normal value  like normal nothing happend
+      await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
+      await this.updateBoardVal(gameId, true, pId, currPawn.position); //dele from the old one
+    }
+    console.log(
+      "before the click from the movepawn after the !pathacivedn",
+      userId
+    );
+    const newBackBone: Record<backBone, any> = await this.NewBackBone(
       gameId,
       [],
       1,
@@ -373,8 +409,8 @@ export class GameManager{
         await UserRepo.updateUserData(i, { onGoingGame: null });
       }
       const gameData = await GameRepo.deleteGame(gameId);
-      const data = await RedisInstance.cleanInMemory(gameId);  
-       return true;
+      const data = await RedisInstance.cleanInMemory(gameId);
+      return true;
     } catch (error) {
       console.log("Error in game manager", error);
       throw new Error("Error while deleting the gameData and redis instance");

@@ -1,7 +1,7 @@
 import type { NextFunction, Request,Response } from "express";
 import { auth } from "../lib/auth";
 import { fromNodeHeaders } from "better-auth/node";
-import type { Session, User } from "better-auth/*";
+import type { Session, User } from "better-auth";
 
 
 declare global {
