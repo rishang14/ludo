@@ -1,0 +1,25 @@
+
+
+services:
+  redis:
+    image: redis:5-alpine
+    container_name: ludo-redis-db
+    ports:
+      - "6379:6379"
+  
+  bacend: 
+    build:
+      context: .
+      dockerfile: Dockerfile  
+
+    image: my-ludo-backend:v1.0
+    container_name: ludo-backend-instance 
+
+    ports:
+     - "8000:8000" 
+     - "8001:8001" 
+    environment:
+    - REDIS_HOST=redis 
+    - REDIS_PORT=6379
+    depends_on:
+      - redis

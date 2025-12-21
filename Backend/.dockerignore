@@ -1,0 +1,17 @@
+# Ignore common development and version control files
+.git
+.gitignore
+node_modules
+logs
+npm-debug.log*
+
+# Ignore temporary files and build artifacts
+**/__pycache__
+**/*.pyc
+**/target
+dist/
+
+# Ignore sensitive environment files
+.env
+.aws/
+id_rsa
