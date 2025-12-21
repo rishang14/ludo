@@ -14,11 +14,10 @@ import {
 } from "../../utils/constant";
 import { RedisInstance } from "../redis/redisClient";
 import { calcMove } from "../../lib/helper";
-import { GameRepo } from "../../repositry/game.repositry";
-import { UserRepo } from "../../repositry/user.repositry";
+// import { GameRepo } from "../../repositry/game.repositry";
+// import { UserRepo } from "../../repositry/user.repositry";
 import { wss } from "../..";
-import { success } from "zod";
-import { fa } from "zod/locales";
+// import { success } from "zod";
 
 export class GameManager {
   public static async initBoard(totlPlayerIds: string[], gameId: string) {
@@ -109,11 +108,9 @@ export class GameManager {
     }
   const userJoined = await this.addUserToGame(gameId, userId);
     const updatedLength = await this.getTotalJoinedUsers(gameId);
-     console.log("length after user added",updatedLength)
     if (totalplayers === updatedLength?.length) {
       const gameInitStatus = await RedisInstance.getInitGameStatus(gameId);
       if (!gameInitStatus && updatedLength) { 
-        console.log("game is init first time")
         await RedisInstance.setGameInIt(gameId, true);
         await this.initBoard(updatedLength, gameId);
       } 
@@ -184,13 +181,18 @@ export class GameManager {
     return Math.floor(Math.random() * 6) + 1;
   }
 
-  private static async calcNextTurn(userId: string, gameId: string) {
+  private static async calcNextTurn(userId: string, gameId: string){
     const turns: string[] = (await RedisInstance.getJoinedUser(
       gameId
-    )) as string[];
+    )) as string[]; 
+    const winnersIds= await RedisInstance.getWinners(gameId); 
+    console.log("winner ids",winnersIds)
     const idx = turns.indexOf(userId);
     const totalLength = turns.length;
-    const newIdx = idx + 1 >= totalLength ? 0 : idx + 1;
+    let newIdx = idx + 1 >= totalLength ? 0 : idx + 1;  
+    while(winnersIds.includes(turns[newIdx] as string)){
+       newIdx = newIdx >= totalLength? 0:newIdx+1;
+    }
     return turns[newIdx];
   }
 
@@ -198,47 +200,37 @@ export class GameManager {
     gameId: string,
     movablePawns: string[],
     diceVal: number,
-    userId: string,
+    userId: string, 
     currentUserTurn: boolean,
     canDiceMove: boolean,
-    canPawnMove: boolean
+    canPawnMove: boolean,
+    winnerOrders?:string[]
   ) {
     const turn = await this.calcNextTurn(userId, gameId);
-    console.log(turn, "turn");
-    console.log(currentUserTurn, "current user TURN");
-    console.log("userId", userId);
-    console.log(
-      gameId,
-      "gameId",
-      currentUserTurn ? userId : turn!,
-      "userid in the backbone  "
-    );
     const color = await RedisInstance.getUserWithColor(
       gameId,
       currentUserTurn ? userId : turn!
-    );
+    ); 
+    console.log("winner orders",winnerOrders)
     const val: Record<backBone, any> = {
       diceVal,
       canDiceRoll: canDiceMove,
       canPawnMove: canPawnMove,
       currentTurn: color,
-      winnerOrders: [],
+      winnerOrders: winnerOrders ?? [],
       currentUserTurn: currentUserTurn ? userId : turn!,
       movablePawns,
     };
-    console.log("val for the backbone", val);
     return val;
   }
 
   public static async rollDice(gameId: string, userId: string) {
     const gameState = await RedisInstance.getGameStatus(gameId);
-    console.log("userId", userId, "gameId", gameId);
+    // console.log("userId", userId, "gameId", gameId);
     if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
     const diceVal = this.generateDiceVal();
-    // console.log(this.userIdWithColor.forEach(t => console.log(t,"for user")))
-    console.log(gameId, "gameId", userId, "userid in the roll dice one ");
     const p = await RedisInstance.getUserWithColor(gameId, userId);
     if (!p) throw new Error("UserId is Wrong");
     const movablePawns = await this.calcMovablePawn(
@@ -246,8 +238,6 @@ export class GameManager {
       p.charAt(0),
       diceVal
     );
-    console.log("before the movablae pawn in roll dice", movablePawns.length);
-    console.log("in roll dice one and code crashed here");
     const newBackBone = await this.NewBackBone(
       gameId,
       movablePawns,
@@ -340,9 +330,10 @@ export class GameManager {
   }
 
   public static async movePawn(gameId: string, userId: string, pId: string) {
-    const gameState = await RedisInstance.getGameStatus(gameId);
-    const gameDetails = await GameManager.getGame(gameId);
-    const movablePawns: string[] = JSON.parse(gameState.movablePawns!);
+    const gameState = await RedisInstance.getGameStatus(gameId); 
+    console.log("gamestate in the movepawn",gameState)
+    const movablePawns: string[] = JSON.parse(gameState.movablePawns!); 
+    let winnerOrders:string[]=JSON.parse(gameState.winnerOrders!);
     const diceVal = JSON.parse(gameState.diceVal!);
     const color = JSON.parse(gameState.currentTurn!);
     const pawnPath: string[] = pathToWin[color as colors];
@@ -361,7 +352,7 @@ export class GameManager {
     let captured: string = "";
     let nextTurn: boolean = false;
     if (!globalSafePlace.has(newPos) && !pathAcheived) {
-      console.log("i entered in !pathachived one with the global safeplace");
+      // console.log("i entered in !pathachived one with the global safeplace");
       const { capturedPawn, captruedSuccess } = await this.capturePawn(
         newPos,
         currPawn,
@@ -389,21 +380,20 @@ export class GameManager {
         nextTurn = true;
       }
     }
-    if (pathAcheived) {
+    if (pathAcheived){
       await RedisInstance.updatePawnVlalue(gameId, currPawn.pId, {
         ...currPawn,
         isFinished: true,
         isHome,
       });
-      const allpawn = await this.getTeamPawn(gameId, currPawn.pId.charAt(0));
-      let totalFinishedPawn = allpawn.filter((i) => i.isFinished === true);
-      console.log("length of finished pawn", totalFinishedPawn);
-      if (totalFinishedPawn.length === 4) {
-        const getUser = await UserRepo.getUserById(userId);
+      await this.updateBoardVal(gameId, true, pId, currPawn.position); //reomved from the global board
+      const {success,gameEnded,winnerOrders:winners}= await this.calcGameWinner(gameId,currPawn)
+      if (gameEnded){
+        // const getUser = await UserRepo.getUserById(userId);
         wss.broadcastToUsers(gameId, "winner_Found", {
           winnerColor: currPawn.color,
           userId: userId,
-          winnerName: getUser?.name,
+          winnerOrders,
           gameId: gameId,
           pawnId: pId,
           pawnNewPos: newPos,
@@ -412,9 +402,8 @@ export class GameManager {
           backbone: gameState,
         });
         return;
-      }
-
-      await this.updateBoardVal(gameId, true, pId, currPawn.position); //reomved from the global board
+      } 
+      winnerOrders=winners; 
       nextTurn = true;
     }
     if (+diceVal === 6) {
@@ -426,18 +415,16 @@ export class GameManager {
       await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
       await this.updateBoardVal(gameId, true, pId, currPawn.position); //dele from the old one
     }
-    console.log(
-      "before the click from the movepawn after the !pathacivedn",
-      userId
-    );
+
     const newBackBone: Record<backBone, any> = await this.NewBackBone(
       gameId,
       [],
       1,
       userId,
-      nextTurn,
+      nextTurn, 
       true,
-      false
+      false,
+      winnerOrders,
     );
     for (const [key, value] of Object.entries(newBackBone)) {
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
@@ -451,18 +438,53 @@ export class GameManager {
     };
   }
 
-  public static async exitOrDeleteGame(gameId: string) {
-    try {
-      const getGame = await GameRepo.getGame(gameId);
-      for (const i of getGame.playerIds) {
-        await UserRepo.updateUserData(i, { onGoingGame: null });
-      }
-      const gameData = await GameRepo.deleteGame(gameId);
-      const data = await RedisInstance.cleanInMemory(gameId);
-      return true;
-    } catch (error) {
-      console.log("Error in game manager", error);
-      throw new Error("Error while deleting the gameData and redis instance");
-    }
+  // public static async exitOrDeleteGame(gameId: string) {
+  //   try {
+  //     const getGame = await GameRepo.getGame(gameId);
+  //     for (const i of getGame.playerIds) {
+  //       await UserRepo.updateUserData(i, { onGoingGame: null });
+  //     }
+  //     const gameData = await GameRepo.deleteGame(gameId);
+  //     const data = await RedisInstance.cleanInMemory(gameId);
+  //     return true;
+  //   } catch (error) {
+  //     console.log("Error in game manager", error);
+  //     throw new Error("Error while deleting the gameData and redis instance");
+  //   }
+  // }   
+
+
+  public static async calcGameWinner(gameId:string,pawn:pawn){  
+    const gameDetail=await this.getGame(gameId);  
+    const gameState = await RedisInstance.getGameStatus(gameId);
+    let totalPlayers=Number(JSON.parse(gameDetail.totalPlayers)); 
+    let winnerOrders:string[]= JSON.parse(gameState.winnerOrders!);  
+    const allpawn = await this.getTeamPawn(gameId,pawn.pId.charAt(0)); 
+    console.log("all pawn ",allpawn)
+    const totalPawnFinished= allpawn.filter(p => p.isFinished===true); 
+    console.log("Finished pawns",totalPawnFinished)  
+    if(totalPawnFinished.length===4){ 
+      console.log("got inside the all pawn if condition 🫡🫡")
+      if(totalPlayers ===2){ 
+        console.log("in calcgameWinner totalength 2 from there")
+     return {success:true,gameEnded:true, winnerOrders:[pawn.color]};
+      } 
+      if(totalPlayers>2){ 
+        if(winnerOrders.length === totalPlayers-1){  
+          console.log("inside the winnerOder length -1 scenario")
+          winnerOrders.push(pawn.color)
+          return {success:true, gameEnded:true, winnerOrders}; 
+        }
+          //remove from the set of the turn and the user with color 
+          await RedisInstance.setWinner(gameId,pawn.userId); 
+          winnerOrders.push(pawn.color)
+          return {success:true,gameEnded:false,winnerOrders};
+        }
+    }   
+    return {success:false,gameEnded:false,winnerOrders};
   }
 }
+
+
+
+//i  have to make sure that when user with all pawn won it should not get his/her turn 

@@ -68,7 +68,7 @@ export const useSocket = create<SocketType>()((set, get) => ({
         useGameStore.getState().updateBackbone(payload.data.backbone);
         break;
       case "move_Pawn":
-        if (payload.data.backbone) {
+        if (payload?.data && payload.data?.backbone){
           useGameStore.getState().updateBackbone(payload.data.backbone);
         }
         const { pawnId, pawnNewPos, pawnWon, capturedPawn } = payload.data;

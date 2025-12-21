@@ -18,17 +18,22 @@ export class RedisInstance {
     return `${gameId}:userWithColorKey`  
   }  
 
-  private static getJoinedUserKey(gameId:string){
+  private static joinedUserKey(gameId:string){
     return `${gameId}:totalUser`;
   }  
 
-  private static  getGameKey(gameId:string){
+  private static  gameKey(gameId:string){
     return `${gameId}:game`;
   } 
 
-  private static gameIinitializedKey(gameId:string){
+  private static initializedKey(gameId:string){
     return `${gameId}:gameInit`
+  }   
+
+  private static winnerKey(gameId:string){
+    return  `gameId:${gameId}:winner`
   }
+
 
   public static async initialize() {
     if (this.client) {
@@ -45,7 +50,6 @@ export class RedisInstance {
     this.client.on("connect", () => {
       console.log("redis is connected ");
 
-
     });
 
     this.client.on("error", (err) => {
@@ -53,6 +57,12 @@ export class RedisInstance {
     });
 
     await this.client.connect();
+  } 
+
+  private static async expire(key:string,){
+   if(!this.client)return;  
+   
+  await this.client.expire(key,60*40)
   }
    
  public static async setGameInIt(gameId:string,value:boolean){
@@ -60,16 +70,17 @@ export class RedisInstance {
   throw  new Error("Redis is not conneced")
  }   
 
- const key =await this.gameIinitializedKey(gameId); 
+ const key = this.initializedKey(gameId); 
 
- const val= await this.client.hSet(key,"initalized",JSON.stringify(value)); 
+ const val= await this.client.hSet(key,"initalized",JSON.stringify(value));  
+            await this.expire(key)
  }  
   
  public static async getInitGameStatus(gameId:string){
   if(!this.client){
     throw new Error("Redis is not connected")
   }  
-  const key=this.gameIinitializedKey(gameId);
+  const key=this.initializedKey(gameId);
   const val=await  this.client.hGet(key,"initalized"); 
  if(!val){
   return null
@@ -81,15 +92,16 @@ export class RedisInstance {
      if (!this.client) {
       throw new Error("Redis is not connected");
     }  
-    const key=this.getGameKey(gameId); 
-    const details = await this.client.hSet(key,"gameDetails",JSON.stringify(payload)); 
+    const key=this.gameKey(gameId); 
+    const details = await this.client.hSet(key,"gameDetails",JSON.stringify(payload));  
+    await this.expire(key)
  }   
  
   public static async alreadyInJoinedUser(gameId:string,userId:string){
     if(!this.client){
       throw new Error("Redis is not connected"); 
     }  
-    const key= this.getJoinedUserKey(gameId)
+    const key= this.joinedUserKey(gameId)
     const userExists= await this.client.sIsMember(key,userId); 
     return userExists;
   }
@@ -99,7 +111,7 @@ export class RedisInstance {
   if(!this.client){
     throw new Error("Redis is not connected"); 
   } 
-  const key= this.getGameKey(gameId); 
+  const key= this.gameKey(gameId); 
   const gameDetails=await this.client.HGET(key,"gameDetails"); 
   if(!gameDetails){
      throw new Error("game not found")
@@ -125,7 +137,8 @@ export class RedisInstance {
     }  
     try {
     const key=this.userWithColorKey(gameId)
-    const setUserWithColor=await this.client.HSET(key,userId,JSON.stringify(val)); 
+    const setUserWithColor=await this.client.HSET(key,userId,JSON.stringify(val));  
+      await this.expire(key)
     } catch (error) {
        console.log("errorwhile seting up the userwith color", error)
     }
@@ -152,21 +165,43 @@ export class RedisInstance {
    if(!this.client){
     throw new Error("Redis is not connected");  
    } 
-   const key = this.getJoinedUserKey(gameId); 
+   const key = this.joinedUserKey(gameId); 
 
-   const totalUser= await this.client.SADD(key,val)    
+   const totalUser= await this.client.SADD(key,val)     
+      await this.expire(key)
   }    
 
   public static async getJoinedUser(gameId:string){
     if(!this.client){
       throw new Error("Redis is not connected")  
     }  
-    const key = this.getJoinedUserKey(gameId); 
+    const key = this.joinedUserKey(gameId); 
     const totalUser= await this.client.SMEMBERS(key);  
     if(!totalUser){
-     return null
+     return []
     }
     return totalUser;
+  }    
+
+  public static async setWinner(gameId:string,userId:string){
+    if(!this.client){
+      throw new Error("Redis is not connected"); 
+    } 
+    const key=this.winnerKey(gameId); 
+         await this.client.SADD(key,userId);  
+          await this.expire(key);
+  }     
+
+  public static async getWinners(gameId:string){
+    if(!this.client){
+     throw new Error("Redis is not connected")
+     } 
+     const key= this.winnerKey(gameId); 
+     const winner= this.client.SMEMBERS(gameId); 
+     if(!winner){
+      return [];
+     } 
+     return winner;
   }
 
   public static async getAllPawn(gameId: string) {
@@ -193,7 +228,6 @@ export class RedisInstance {
       pawnVal.pId,
       JSON.stringify(pawnVal)
     );
-   
   }
 
   public static async updatePawnVlalue(
@@ -318,13 +352,16 @@ export class RedisInstance {
     const cellkey=this.boardKey(gameId); 
     const pawnKey=this.pawnKey(gameId); 
     const state=this.boardStateKey(gameId); 
-    const userWithColor= this.userWithColorKey(gameId);  
+    const userWithColor= this.userWithColorKey(gameId);   
+    const initBoard= this.initializedKey(gameId); 
+    const totalUser= this.joinedUserKey(gameId);  
+    const game=this.gameKey(gameId);
 
     if(!this.client){
       throw new Error("Redis is not connected")  
     }    
-     const deleted= await this.client.unlink([cellkey,pawnKey,state,userWithColor]); 
+     const deleted= await this.client.unlink([cellkey,pawnKey,state,userWithColor,initBoard,totalUser,game]); 
      console.log("we are deleted from the redis instance",deleted);
     return deleted;
  }
-}
+}  

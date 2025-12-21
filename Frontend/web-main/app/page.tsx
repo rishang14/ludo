@@ -38,7 +38,7 @@ export default async function Page() {
             </h1>
             <Dice6 className="h-10 w-10 md:h-12 md:w-12 text-accent animate-bounce animate-duration-[2s] animate-delay-300" />
           </div>
-          <Logoutbutton />
+          {/* <Logoutbutton /> */}
         </div>
         <div className="flex gap-2  flex-wrap justify-center items-center">
           <PlaywithfriendCard  userId={""}/>

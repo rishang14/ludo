@@ -1,6 +1,6 @@
 import express from "express"
-import { Authenticate } from "../middleware/session";
-import { initGame,gameValidation ,getOngoingGame, exitGame, joinGame} from "../controller/game.controller";
+// import { Authenticate } from "../middleware/session";
+import { initGame ,getOngoingGame, exitGame, joinGame} from "../controller/game.controller";
 
 
 const router= express.Router();   

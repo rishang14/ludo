@@ -1,56 +1,23 @@
 {
   "compilerOptions": {
-    /* ========================
-       Build / Output
-    ======================== */
-    "outDir": "./dist",
-    "noEmit": true,
-
-    /* ========================
-       Language & Environment
-    ======================== */
     "target": "ES2023",
     "lib": ["ESNext"],
-
-    /* ========================
-       Module System (Node + ESM)
-    ======================== */
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
-
-    /* ========================
-       Type Checking (Strict)
-    ======================== */
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
     "isolatedModules": true,
-
-    /* ========================
-       Declarations / Maps
-    ======================== */
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-
-    /* ========================
-       JSX (safe to keep even for backend)
-    ======================== */
-    "jsx": "react-jsx",
-
-    /* ========================
-       Safety / Performance
-    ======================== */
+    "resolveJsonModule": true,
     "noUncheckedSideEffectImports": true,
     "skipLibCheck": true
   },
-
-  /* ========================
-     Files to Include
-  ======================== */
-  "include": ["src", "src/types"]
+  "include": ["src", "src/types"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -99,7 +99,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
           </div>
           <div className="red-path horizontal-path bg-zinc-50">
             <DrawPath
-              className=" -m-px border border-r-0   border-slate-950"
+              className=" -m-px border  border-b-0   border-slate-950"
               path={redBoardPath}
               drawBgColorOnPath={drawRedColor}
               userId={userId}
@@ -141,7 +141,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
           </div>
           <div className="yellow-path horizontal-path bg-zinc-50">
             <DrawPath
-              className=" -m-px border border-r-0 border-slate-950"
+              className=" -m-px border border-b-0 border-slate-950"
               path={yellowBoardPath}
               drawBgColorOnPath={drawYellowColor}
               userId={userId}

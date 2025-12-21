@@ -1,9 +1,9 @@
 import { WebSocketServer } from "ws";
 import { RoomManager } from "./roomManager";
 import { GameManager } from "../game/gameManager";
-import { UserRepo } from "../../repositry/user.repositry";
+// import { UserRepo } from "../../repositry/user.repositry";
 import cookie from "cookie";
-import { RedisInstance } from "../redis/redisClient";
+// import { RedisInstance } from "../redis/redisClient";
 
 export class RealTime {
   public wss: WebSocketServer;
@@ -73,6 +73,7 @@ export class RealTime {
             })
           );
           socket.close();
+
         }
         this.room.joinRoom(`game:${gameId}`, `user:${userId}`, socket);
         const totalPlayers = Number(
@@ -113,7 +114,7 @@ export class RealTime {
         });
         break;
       case "roll_Dice":
-        console.log("roll dice val", msg);
+        // console.log("roll dice val", msg);
         const backBone = await GameManager.rollDice(gameId, userId);
         this.room.broadcastInRoom(`game:${gameId}`, {
           type: "dice_Rolled",
@@ -121,7 +122,7 @@ export class RealTime {
         });
         break;
       case "pawn_Clicked":
-        console.log("pawnClicked getting userId or not", msg);
+        // console.log("pawnClicked getting userId or not", msg);
         const move = await GameManager.movePawn(
           gameId,
           userId,

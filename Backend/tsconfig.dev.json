@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,  // tsx handles compilation
+    "allowImportingTsExtensions": true  // Enabled for tsx
+  }
+}

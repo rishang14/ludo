@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "user" ADD COLUMN     "lost" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "onGoingGame" TEXT,
-ADD COLUMN     "wins" INTEGER NOT NULL DEFAULT 0;

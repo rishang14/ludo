@@ -1,10 +1,8 @@
 import express from "express";
 import type { NextFunction, Request, Response } from "express";
-import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import cors from "cors";
 import http from "http"; 
 import cookieParser from "cookie-parser"
-import { auth } from "./lib/auth";
 import { RealTime } from "./services/ws/realTime";
 import { RedisInstance } from "./services/redis/redisClient";
 import { GameRoutes } from "./routes";
@@ -21,7 +19,6 @@ app.use(
   })
 );
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json()); 
 app.use(cookieParser());
@@ -37,12 +34,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("hello").status(200);
 });
 
-app.get("/api/me", async (req: Request, res: Response) => {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-  return res.json(session);
-}); 
+
 app.use("/game",GameRoutes);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
@@ -61,4 +53,12 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled Rejection:", reason);
   process.exit(1);
+});
+
+app.listen(8000, () => {
+  console.log(" Listening on port 8000");
+});
+
+server.listen(8001, () => {
+  console.log("Server running on port 8001");
 });
