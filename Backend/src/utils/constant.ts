@@ -358,15 +358,15 @@ export const gameStarterkit:kit[]= [
   }, 
   {
     key:"movablePawns", 
-    value:[]
+    value:[],
   }, 
   {
     key:"currentUserTurn", 
-    value:""
+    value:"",
   },  
   {
     key:"winnerOrders",
-    value:[]
+    value:[],
   },{ 
   key:"currentTurn", 
   value:"" 

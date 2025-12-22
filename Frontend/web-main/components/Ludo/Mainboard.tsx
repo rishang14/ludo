@@ -86,14 +86,13 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
   return (
     <>   
 
-      <div className=" md:max-w-5xl mx-auto h-screen flex items-center p-5 flex-col  justify-start gap-2   ">
-        <div className=" space-y-2">
+      <div className=" md:max-w-5xl md:mx-auto h-screen flex  items-center md:p-5 md:flex-row flex-col  md:items-center  gap-2   ">
+             <div className="md:flex md:items-center md:flex-col md:flex-1 space-y-2">
           <h2 className="text-white text-center  text-4xl font-serif">
             Ludo Board
           </h2>
-        </div>
 
-        <div id="ludoBoard" className="rounded-sm">
+        <div id="ludoBoard" className="rounded-sm"> 
           <div className="red-board flex items-center justify-center rounded-sm bg-red-700/70">
             <StartBorad bgColor="bg-red-500/80" pawnHome={redPawnHome} />
           </div>
@@ -149,8 +148,9 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
               pathname="yellow"
             />
           </div>
-        </div>
-        <div className="h-[150px] mx-auto flex p-2 justify-center flex-col gap-2 items-center w-[80%] bg-slate-800 rounded-md ">
+        </div> 
+          </div>
+        <div className=" md:mx-auto flex md:p-2 justify-center flex-col    gap-2 items-center md:w-[20%] w-full rounded-md ">
           <h1 className="text-white font-serif   ">Roll Dice: {diceVal}</h1>
           <h2 className="text-white font-serif">
             {currentUserTurn === userId ? "Your" : "Opponent"} turn

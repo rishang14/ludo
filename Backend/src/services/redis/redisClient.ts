@@ -145,7 +145,7 @@ export class RedisInstance {
     }  
 
       public static async getUserWithColor(gameId:string,userId:string){ 
-        console.log("user with color", userId)
+        // console.log("user with color", userId)
     const key = this.userWithColorKey(gameId); 
     if(!this.client){
       throw new Error("Redis is not connected")
@@ -153,11 +153,11 @@ export class RedisInstance {
    try {
       const userWithColor= await this.client.hGet(key,userId); 
     if(!userWithColor){
-      throw new Error("Invalid gameId or pawnId"); 
+      return null;
     } 
     return JSON.parse(userWithColor);
    } catch (error) {
-    console.log("error while getting up userwith color",error)
+    console.log("error while getting up user with color",error)
    }
   }  
  
@@ -309,7 +309,9 @@ export class RedisInstance {
   ) {
     if (!this.client) {
       throw new Error("Redis is not connected");
-    }
+    } 
+    console.log(details,"reiced to set the order") 
+    console.log(val,"value of the key")
    try {
      const key = this.boardStateKey(gameId);
     const state = await this.client.hSet(key, details, JSON.stringify(val));

@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import Ludo from "@/components/Ludo/Mainboard";
-import {  getSession } from "@/lib/action/server.action";
-import { redirect } from "next/navigation";
 
 const page = async ({
   params,

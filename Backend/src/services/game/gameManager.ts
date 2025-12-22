@@ -61,23 +61,27 @@ export class GameManager {
     }
 
     //gameStarterkit
-    for (const p of gameStarterkit) {
-      if ((p.key as Partial<backBone>) === "currentUserTurn") {
+    for (const p of gameStarterkit){ 
+      // console.log(p,  "++++++++++++++++++++++++")
+      if ((p.key as Partial<backBone>) === "currentUserTurn") { 
+        // console.log(p, "____________________________")
         await RedisInstance.updateBoardStateKey(
           gameId,
           p.key,
           totlPlayerIds[0]
         );
-        return;
+        continue;
       }
-      if ((p.key as Partial<backBone>) === "currentTurn") {
+      if ((p.key as Partial<backBone>) === "currentTurn"){ 
+        // console.log(p,"{{{{{{{{{{{{{{{{{{{{{{{{{{")
         const color = await RedisInstance.getUserWithColor(
           gameId,
           totlPlayerIds[0]!
-        );
+        ); 
         await RedisInstance.updateBoardStateKey(gameId, p.key, color);
-        return;
-      }
+        continue;
+      } 
+      // console.log(p.key,"key while setting up the winnerorders")
       await RedisInstance.updateBoardStateKey(gameId, p.key, p.value);
     }
   }
@@ -106,15 +110,19 @@ export class GameManager {
        };
    }
     }
-  const userJoined = await this.addUserToGame(gameId, userId);
+  const userJoined = await this.addUserToGame(gameId, userId); 
+  if(!gameId  || !userId){
+    console.log("not got the gameId and userId",gameId,userId);
+  }
     const updatedLength = await this.getTotalJoinedUsers(gameId);
     if (totalplayers === updatedLength?.length) {
       const gameInitStatus = await RedisInstance.getInitGameStatus(gameId);
       if (!gameInitStatus && updatedLength) { 
-        await RedisInstance.setGameInIt(gameId, true);
+        await RedisInstance.setGameInIt(gameId, true); 
+        console.log(updatedLength,"of the user while init the game")
         await this.initBoard(updatedLength, gameId);
       } 
-      console.log("Returing from the total player equal to scenraio")
+      // console.log("Returing from the total player equal to scenraio")
       return {
         success: true,
         sendGameStatus: true,
@@ -225,8 +233,12 @@ export class GameManager {
   }
 
   public static async rollDice(gameId: string, userId: string) {
-    const gameState = await RedisInstance.getGameStatus(gameId);
-    // console.log("userId", userId, "gameId", gameId);
+     const gameState = await RedisInstance.getGameStatus(gameId);  
+     let winnerOrders:string[]= JSON.parse(gameState.winnerOrders!) ?? [];  
+    //  console.log(winnerOrders ,"WINNER orders ")  
+     console.log(gameState,"gamestate");
+     console.log(JSON.parse(gameState.winnerOrders!),"json") 
+     console.log(gameState,"gamestate");
     if (JSON.parse(gameState?.currentUserTurn!) !== userId) {
       throw new Error("Its not Ur Turn");
     }
@@ -245,10 +257,10 @@ export class GameManager {
       userId,
       movablePawns.length > 0,
       movablePawns.length > 0 ? false : true,
-      movablePawns.length > 0
+      movablePawns.length > 0, 
+      winnerOrders
     );
     for (const [key, value] of Object.entries(newBackBone)) {
-      // console.log(key ,"value fo the backbone",value);
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
     return {

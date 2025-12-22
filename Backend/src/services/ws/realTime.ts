@@ -34,7 +34,7 @@ export class RealTime {
       });
 
       socket.on("close", () => {
-        console.log("Close happend");
+        console.log("Close happend")
         this.room.clearConnection(socket);
       });
 
@@ -49,7 +49,10 @@ export class RealTime {
 
   private async handlers(socket: any, msg: any) {
     const gameId = socket.gameId;
-    const userId = socket.playerId;
+    const userId = socket.playerId;   
+    console.log(gameId,"gameId"); 
+    console.log(userId,"uerId"); 
+    console.log(msg,"message  details in the socket")
     switch (msg.type) {
       case "join_User":
         const gameDetails = await GameManager.getGame(gameId);
