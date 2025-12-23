@@ -17,4 +17,10 @@ export const userJoinedBroadCast= (data:string)=>{
 
 export const sendPawnMoveToServer=(gameId:string,userId:string,pId :string)=>{ 
     useSocket.getState().sendToServer("pawn_Clicked",{gameId,userId,pId}) 
+}   
+
+
+export const handleWsError=(error:string)=>{
+    toast.info("Error",{duration:3000,description:error}); 
+    return redirect("/");
 }

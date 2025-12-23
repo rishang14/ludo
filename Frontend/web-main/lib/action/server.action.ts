@@ -21,15 +21,16 @@ export const getSession= async()=>{
 
 
 
-export const getOngoingGame= async()=>{
+export const getOngoingGame= async(gameId:string)=>{ 
+  if(!gameId )return;
   try {
-   const value= await fetch(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/getongoinggame`,{
+   const value= await fetch(`${process.env.NEXT_PUBLIC_API_HTTP_ENDPOINT}/game/getongoinggame/${gameId}`,{
       headers:await headers()
    }) ; 
     const data = await value.json(); 
     return data;
   } catch (error) {
-    console.log("error in onginog game",error);
+    return null;
   }
 }  
 

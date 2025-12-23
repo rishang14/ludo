@@ -29,7 +29,7 @@ const [loading,setLoadig]=useState<boolean>(false)
   if (!winnerFound) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center w-full md:max-w-2xl border-4 border-yellow-600 bg-yellow-100 p-8 rounded-lg backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center mx-auto w-full md:max-w-2xl border-4 border-yellow-600 bg-yellow-100 p-8 rounded-lg backdrop-blur-sm animate-fade-in">
 
        <div className="space-y-6 text-center">
           {/* Title */}

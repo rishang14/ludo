@@ -68,5 +68,6 @@ export  type capturedReturnType={
 
 export type gameInitType={
   gameId:string ,
-  totalPlayers:string,
+  totalPlayers:string, 
+  status:"created" | "completed"
 }

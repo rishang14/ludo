@@ -22,12 +22,10 @@ export class RealTime {
         : {};
 
       const playerId = cookies.playerId;
-      const gameId = cookies.gameId;
-      if (!playerId || !gameId) {
+      if (!playerId ) {
         socket.close(1008, "unauthorized");
       }
       socket.playerId = playerId ?? "";
-      socket.gameId = gameId ?? "";
       socket.on("message", (data) => {
         const msg = JSON.parse(data.toString());
         this.handlers(socket, msg);
@@ -48,8 +46,9 @@ export class RealTime {
   }
 
   private async handlers(socket: any, msg: any) {
-    const gameId = socket.gameId;
-    const userId = socket.playerId;   
+    const gameId = msg.payload.gameId;
+    const userId = socket.playerId;  
+    console.log(userId,"userId in socket")  
     switch (msg.type) {
       case "join_User":
         const gameDetails = await GameManager.getGame(gameId);

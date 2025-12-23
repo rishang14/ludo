@@ -77,7 +77,9 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
     if (!gameId || !userId) return;
     setGameAndUser(gameId, userId);
     if (isConnected) {
-      sendToServer("join_User");
+      sendToServer("join_User",{
+        gameId
+      });
     }
   }, [isConnected, gameId, userId]);
    if(!gameStarted){

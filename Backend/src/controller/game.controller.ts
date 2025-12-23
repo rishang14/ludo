@@ -10,10 +10,8 @@ import { v4 as uuidV4 } from "uuid";
 // import { wss } from "../index";
 import { RedisInstance } from "../services/redis/redisClient";
 
-
 export const initGame = async (req: Request, res: Response) => {
-  try {  
-
+  try {
     const validate = initGameSchema.safeParse(req.body);
     if (!validate.success) {
       return res
@@ -23,35 +21,15 @@ export const initGame = async (req: Request, res: Response) => {
         );
     }
 
-    if (req.cookies.gameId) {
-      return res.json(
-        new ApiResponse(
-          403,
-          req.cookies.gameId,
-          "Complete this game First or go and exit from the game ",
-          true
-        )
-      );
-    }
     const { totalPlayers } = validate.data;
     const createdGameId = uuidV4();
-    const createUserId = uuidV4();
-
-    res.cookie("gameId", createdGameId, {
-      maxAge: 1000 * 60 * 40,
-      httpOnly: true,
-    });  
-
-    res.cookie("playerId",createUserId,{
-      maxAge:40*60*1000,
-      httpOnly:true
-    })
     const payload: gameInitType = {
       gameId: createdGameId,
       totalPlayers: totalPlayers.toString(),
+      status: "created",
     };
-    await RedisInstance.setGame(createdGameId, payload); 
-    await RedisInstance.setGameInIt(createdGameId,false);
+    await RedisInstance.setGame(createdGameId, payload);
+    await RedisInstance.setGameInIt(createdGameId, false);
     return res
       .status(201)
       .json(
@@ -116,13 +94,15 @@ export const initGame = async (req: Request, res: Response) => {
 
 export const getOngoingGame = async (req: Request, res: Response) => {
   try {
-    const gameId = req.cookies.gameId;
-    if (gameId) {
-      return res.json(
-        new ApiResponse(403, gameId, "You are already in a game")
-      );
+    const { gameId } = req.params;
+    if (!gameId) {
+      return res.json(new ApiError(500, "Pls provide gameId"));
     }
-    return res.json(new ApiResponse(200,"","No onGoing game found"));
+    const game = await GameManager.getGame(gameId);
+    if (!game || game.status === "completed") {
+      return res.json(new ApiResponse(404, null, "Game not exist"));
+    }
+    return res.json(new ApiResponse(200, game, "Game details"));
   } catch (error: any) {
     return res.json(
       new ApiError(500, error.message ?? "Internal server Error")
@@ -131,38 +111,32 @@ export const getOngoingGame = async (req: Request, res: Response) => {
 };
 
 export const joinGame = async (req: Request, res: Response) => {
-  try {  
+  try {
     const { gameId } = req.params;
 
     if (!gameId) {
+      return res.json(new ApiError(500, "Pls provide the gameId"));
+    }
+    const getGame = await GameManager.getGame(gameId);
+    if (!getGame || getGame.status === "completed")
+      console.log(getGame, "game in the join game");
+    if (!getGame || getGame.status === "completed") {
       return res.json(new ApiError(500, "Game not Found"));
     }
-    const getGame = await RedisInstance.getGame(gameId as string);
-    console.log(getGame,"game in the join game")
-    if (!getGame) {
-      console.log("inside the gamenotFound");
-      return res.json(new ApiError(500, "Game not exist"));
-    }
-    if (!req.cookies.gameId) {
-      res.cookie("gameId", gameId, {
-        maxAge: 40 * 60 * 1000,
-        httpOnly: true,
-      });
-    }
-
+ 
     let playerId;
-    if (!req.cookies.playerId) {
-      playerId = uuidV4(); 
-      console.log("setting up the cookie for playerId",playerId)
+    if (!req.cookies.playerId) { 
+      playerId = uuidV4();
       res.cookie("playerId", playerId, {
-        maxAge: 40 * 60 * 1000,
-        httpOnly: true,
+        maxAge: 40 * 60 * 1000, 
+        secure:true,
+        httpOnly: true,  
       });
-    }else{
-      playerId=req.cookies.playerId 
-      console.log("got playerId from the cookie",playerId)
+      console.log("setting up in gameAPI",playerId)
+    } else { 
+      console.log(" From cookie playerId",req.cookies.playerId)
+      playerId = req.cookies.playerId;
     }
-
     return res.json(new ApiResponse(200, playerId, "Welocme"));
   } catch (error: any) {
     console.log("error  while joining the game", error);
@@ -189,9 +163,7 @@ export const exitGame = async (req: Request, res: Response) => {
     }
     // const deletegame = await GameManager.exitOrDeleteGame(gameId);
 
-    return res.json(
-      new ApiResponse(200,"", "Game removed successfully")
-    );
+    return res.json(new ApiResponse(200, "", "Game removed successfully"));
   } catch (error: any) {
     console.log("Error", error);
     return res.json(
@@ -199,27 +171,3 @@ export const exitGame = async (req: Request, res: Response) => {
     );
   }
 };
-
-
-export const updatePos=async(req:Request,res:Response)=>{
-  try {
-     const val=["RP1","RP2","RP4","RP3"] 
-     const green=["GP1","GP2","GP3","GP4"] 
-     const greenpos="GW1"
-     const pos="RW1"   
-     const {gameId}= req.params; 
-     if(!gameId)return;
-    for(const p of val){
-      await GameManager.savePawnValue(gameId,false,p,false,pos) 
-      await GameManager.updateBoardVal(gameId,false,p,pos);
-    }   
-    for(const b of green){
-      await GameManager.savePawnValue(gameId,false,b,false,greenpos); 
-      await GameManager.updateBoardVal(gameId,false,b,greenpos)
-    }  
-    
-    return res.status(200).json({message:"updated position"});
-  } catch (error) {
-    return res.json(new ApiError(500,"Internal Server Error"))
-  }
-}

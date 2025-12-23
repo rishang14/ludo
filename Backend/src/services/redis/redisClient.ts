@@ -58,12 +58,6 @@ export class RedisInstance {
 
     await this.client.connect();
   } 
-
-  private static async expire(key:string,){
-   if(!this.client)return;  
-   
-  await this.client.expire(key,60*40)
-  }
    
  public static async setGameInIt(gameId:string,value:boolean){
  if(!this.client){
@@ -73,7 +67,7 @@ export class RedisInstance {
  const key = this.initializedKey(gameId); 
 
  const val= await this.client.hSet(key,"initalized",JSON.stringify(value));  
-            await this.expire(key)
+           
  }  
   
  public static async getInitGameStatus(gameId:string){
@@ -94,7 +88,7 @@ export class RedisInstance {
     }  
     const key=this.gameKey(gameId); 
     const details = await this.client.hSet(key,"gameDetails",JSON.stringify(payload));  
-    await this.expire(key)
+   
  }   
  
   public static async alreadyInJoinedUser(gameId:string,userId:string){
@@ -114,7 +108,7 @@ export class RedisInstance {
   const key= this.gameKey(gameId); 
   const gameDetails=await this.client.HGET(key,"gameDetails"); 
   if(!gameDetails){
-     throw new Error("game not found")
+    return null;
   } 
   return JSON.parse(gameDetails);
  }
@@ -138,7 +132,7 @@ export class RedisInstance {
     try {
     const key=this.userWithColorKey(gameId)
     const setUserWithColor=await this.client.HSET(key,userId,JSON.stringify(val));  
-      await this.expire(key)
+     
     } catch (error) {
        console.log("errorwhile seting up the userwith color", error)
     }
@@ -168,7 +162,7 @@ export class RedisInstance {
    const key = this.joinedUserKey(gameId); 
 
    const totalUser= await this.client.SADD(key,val)     
-      await this.expire(key)
+     
   }    
 
   public static async getJoinedUser(gameId:string){
@@ -189,7 +183,7 @@ export class RedisInstance {
     } 
     const key=this.winnerKey(gameId); 
        const winner=  await this.client.SADD(key,userId);  
-          await this.expire(key); 
+         ; 
    console.log("Winner is set");
 
   }     

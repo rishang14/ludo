@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useGameStore } from "./gameStore";
 import {
+  handleWsError,
   redirectUserTohomeWithToast,
   userJoinedBroadCast,
 } from "@/lib/ws.helper";
@@ -40,7 +41,6 @@ export const useSocket = create<SocketType>()((set, get) => ({
 
     ws.onmessage = (e) => {
       const payload = JSON.parse(e.data); 
-      console.log(payload,"payload of the server")
       get().handleMessage(payload);
     };
   },
@@ -92,12 +92,13 @@ export const useSocket = create<SocketType>()((set, get) => ({
         useGameStore.getState().setWinnerFound(winnerName, winnerColor); 
         break; 
         case"waiting":  
-        console.log(payload.data,"data for payload") 
-        console.log(payload.data.totalPlayers,"totalPlayers") 
         console.log(payload.data.joinedPlayers)   
         const {gameStarted,joinedPlayers,totalPlayers}= payload.data 
          useGameStore.getState().updateGameStart(gameStarted,totalPlayers,joinedPlayers)
-        break;
+        break; 
+        case "error": 
+          const {error}=payload 
+           handleWsError(error);
       default:
         break;
     }
