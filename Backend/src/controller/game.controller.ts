@@ -10,6 +10,7 @@ import { v4 as uuidV4 } from "uuid";
 // import { wss } from "../index";
 import { RedisInstance } from "../services/redis/redisClient";
 
+
 export const initGame = async (req: Request, res: Response) => {
   try {  
 
@@ -198,3 +199,27 @@ export const exitGame = async (req: Request, res: Response) => {
     );
   }
 };
+
+
+export const updatePos=async(req:Request,res:Response)=>{
+  try {
+     const val=["RP1","RP2","RP4","RP3"] 
+     const green=["GP1","GP2","GP3","GP4"] 
+     const greenpos="GW1"
+     const pos="RW1"   
+     const {gameId}= req.params; 
+     if(!gameId)return;
+    for(const p of val){
+      await GameManager.savePawnValue(gameId,false,p,false,pos) 
+      await GameManager.updateBoardVal(gameId,false,p,pos);
+    }   
+    for(const b of green){
+      await GameManager.savePawnValue(gameId,false,b,false,greenpos); 
+      await GameManager.updateBoardVal(gameId,false,b,greenpos)
+    }  
+    
+    return res.status(200).json({message:"updated position"});
+  } catch (error) {
+    return res.json(new ApiError(500,"Internal Server Error"))
+  }
+}

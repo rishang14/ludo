@@ -52,10 +52,9 @@ export const Pawn = ({
     block transition-transform  cursor-pointer
     ${
       movablePawn.has(id)
-        ? "w-10 h-10  scale-110  z-50 "
-        : "hover:scale-105 w-8 h-8"
+        ? "md:w-14 md:h-14 w-10 h-10  scale-110  z-50 "
+        : " md:w-12 md:h-12 w-8 h-8"
     }
-    w-8 h-8
   `}
       >
         <ellipse cx="50" cy="85" rx="35" ry="8" fill="rgba(0,0,0,0.1)" />

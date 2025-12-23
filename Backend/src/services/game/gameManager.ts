@@ -257,8 +257,9 @@ export class GameManager {
       userId,
       movablePawns.length > 0,
       movablePawns.length > 0 ? false : true,
-      movablePawns.length > 0, 
+      movablePawns.length > 0,  
       winnerOrders
+      
     );
     for (const [key, value] of Object.entries(newBackBone)) {
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
@@ -273,7 +274,7 @@ export class GameManager {
     return totalUser;
   }
 
-  private static async savePawnValue(
+  public static async savePawnValue(
     gameId: string,
     isHome: boolean,
     pId: string,
@@ -300,7 +301,7 @@ export class GameManager {
     if (!gameId || !userId) return;
     const setuser = await RedisInstance.setJoinedUsers(gameId, userId);
   }
-  private static async updateBoardVal(
+  public static async updateBoardVal(
     gameId: string,
     captured: boolean,
     pId: string,
@@ -399,7 +400,8 @@ export class GameManager {
         isHome,
       });
       await this.updateBoardVal(gameId, true, pId, currPawn.position); //reomved from the global board
-      const {success,gameEnded,winnerOrders:winners}= await this.calcGameWinner(gameId,currPawn)
+      const {success,gameEnded,winnerOrders:winners}= await this.calcGameWinner(gameId,currPawn) 
+      console.log("winners",winners)
       if (gameEnded){
         // const getUser = await UserRepo.getUserById(userId);
         wss.broadcastToUsers(gameId, "winner_Found", {
@@ -416,7 +418,7 @@ export class GameManager {
         return;
       } 
       winnerOrders=winners; 
-      nextTurn = true;
+      nextTurn = !winnerOrders.includes(currPawn.color) ? true : false;
     }
     if (+diceVal === 6) {
       nextTurn = true;
@@ -427,7 +429,7 @@ export class GameManager {
       await this.updateBoardVal(gameId, false, pId, newPos); //updated in the board
       await this.updateBoardVal(gameId, true, pId, currPawn.position); //dele from the old one
     }
-
+    console.log(winnerOrders,"after the path acheived got ")
     const newBackBone: Record<backBone, any> = await this.NewBackBone(
       gameId,
       [],
@@ -437,7 +439,8 @@ export class GameManager {
       true,
       false,
       winnerOrders,
-    );
+    );   
+    console.log("after the new backbone is formed",newBackBone);
     for (const [key, value] of Object.entries(newBackBone)) {
       await RedisInstance.updateBoardStateKey(gameId, key as backBone, value);
     }
@@ -472,21 +475,24 @@ export class GameManager {
     let totalPlayers=Number(JSON.parse(gameDetail.totalPlayers)); 
     let winnerOrders:string[]= JSON.parse(gameState.winnerOrders!);  
     const allpawn = await this.getTeamPawn(gameId,pawn.pId.charAt(0)); 
-    console.log("all pawn ",allpawn)
     const totalPawnFinished= allpawn.filter(p => p.isFinished===true); 
-    console.log("Finished pawns",totalPawnFinished)  
+    console.log("Finished pawns")  
     if(totalPawnFinished.length===4){ 
       console.log("got inside the all pawn if condition 🫡🫡")
       if(totalPlayers ===2){ 
-        console.log("in calcgameWinner totalength 2 from there")
+        console.log("return calcgameWinner totalength 2 from there")
      return {success:true,gameEnded:true, winnerOrders:[pawn.color]};
       } 
+
       if(totalPlayers>2){ 
-        if(winnerOrders.length === totalPlayers-1){  
+        if(winnerOrders.length === totalPlayers-2){  
           console.log("inside the winnerOder length -1 scenario")
-          winnerOrders.push(pawn.color)
+          winnerOrders.push(pawn.color) 
+          console.log(winnerOrders,"++++++++++++++in the -1 thing")  
+            
           return {success:true, gameEnded:true, winnerOrders}; 
-        }
+        } 
+        console.log("normal scenario where i have aded uderId to the setwinner and  userid........................")
           //remove from the set of the turn and the user with color 
           await RedisInstance.setWinner(gameId,pawn.userId); 
           winnerOrders.push(pawn.color)

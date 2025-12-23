@@ -188,8 +188,10 @@ export class RedisInstance {
       throw new Error("Redis is not connected"); 
     } 
     const key=this.winnerKey(gameId); 
-         await this.client.SADD(key,userId);  
-          await this.expire(key);
+       const winner=  await this.client.SADD(key,userId);  
+          await this.expire(key); 
+   console.log("Winner is set");
+
   }     
 
   public static async getWinners(gameId:string){
@@ -197,7 +199,7 @@ export class RedisInstance {
      throw new Error("Redis is not connected")
      } 
      const key= this.winnerKey(gameId); 
-     const winner= this.client.SMEMBERS(gameId); 
+     const winner=await this.client.SMEMBERS(key); 
      if(!winner){
       return [];
      } 
@@ -310,8 +312,6 @@ export class RedisInstance {
     if (!this.client) {
       throw new Error("Redis is not connected");
     } 
-    console.log(details,"reiced to set the order") 
-    console.log(val,"value of the key")
    try {
      const key = this.boardStateKey(gameId);
     const state = await this.client.hSet(key, details, JSON.stringify(val));

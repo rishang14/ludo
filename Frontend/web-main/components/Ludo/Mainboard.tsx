@@ -94,7 +94,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
 
         <div id="ludoBoard" className="rounded-sm"> 
           <div className="red-board flex items-center justify-center rounded-sm bg-red-700/70">
-            <StartBorad bgColor="bg-red-500/80" pawnHome={redPawnHome} />
+            <StartBorad bgColor="bg-red-500/80" color="Red" pawnHome={redPawnHome} />
           </div>
           <div className="red-path horizontal-path bg-zinc-50">
             <DrawPath
@@ -107,7 +107,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
             />
           </div>
           <div className="green-board flex items-center justify-center rounded-sm bg-green-500/80">
-            <StartBorad bgColor="bg-green-500" pawnHome={greenPawnHome} />
+            <StartBorad bgColor="bg-green-500" color="Blue" pawnHome={greenPawnHome} />
           </div>
           <div className="green-path vertical-path bg-zinc-50">
             <DrawPath
@@ -123,7 +123,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
             <WinZone />
           </div>
           <div className="blue-board rounded-sm  flex items-center justify-center bg-blue-500/70">
-            <StartBorad bgColor="bg-blue-500" pawnHome={bluePawnHome} />
+            <StartBorad bgColor="bg-blue-500" pawnHome={bluePawnHome} color="Blue" />
           </div>
           <div className="blue-path vertical-path bg-zinc-50">
             <DrawPath
@@ -136,7 +136,7 @@ const Ludo: React.FC<LudoProp> = ({ gameId }) => {
             />
           </div>
           <div className="yellow-board flex items-center justify-center rounded-sm  bg-yellow-300/70">
-            <StartBorad bgColor="bg-yellow-400" pawnHome={yellowPawnHome} />
+            <StartBorad bgColor="bg-yellow-400" pawnHome={yellowPawnHome} color="Yellow"/>
           </div>
           <div className="yellow-path horizontal-path bg-zinc-50">
             <DrawPath

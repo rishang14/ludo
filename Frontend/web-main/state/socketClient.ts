@@ -39,7 +39,8 @@ export const useSocket = create<SocketType>()((set, get) => ({
     };
 
     ws.onmessage = (e) => {
-      const payload = JSON.parse(e.data);
+      const payload = JSON.parse(e.data); 
+      console.log(payload,"payload of the server")
       get().handleMessage(payload);
     };
   },
@@ -68,9 +69,10 @@ export const useSocket = create<SocketType>()((set, get) => ({
         useGameStore.getState().updateBackbone(payload.data.backbone);
         break;
       case "move_Pawn":
+        if(!payload.data)return;
         if (payload?.data && payload.data?.backbone){
           useGameStore.getState().updateBackbone(payload.data.backbone);
-        }
+        } 
         const { pawnId, pawnNewPos, pawnWon, capturedPawn } = payload.data;
         const captured = capturedPawn.length > 0; 
         useGameStore
